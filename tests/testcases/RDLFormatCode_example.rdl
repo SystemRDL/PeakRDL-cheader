@@ -1,0 +1,19 @@
+addrmap RDLFormatCode_example {
+
+    reg {
+        field { name = "field a"; desc="A field with a [b]bold[/b], [i]Italic[/i], [u]underline[/u] and [code]code[/code]"; } field_a[31:0];
+    } reg_a;
+
+    reg {
+        name = "Register B";
+        desc = "A register a list:[list][*] item one [*] item two [/list]";
+        field { } field_b[31:0];
+    } reg_b;
+
+    reg {
+        name = "Register C";
+        desc = "A plain description of a register";
+        field { } field_b[31:0];
+    } reg_c;
+
+};

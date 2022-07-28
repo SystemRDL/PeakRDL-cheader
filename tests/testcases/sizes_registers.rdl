@@ -1,0 +1,78 @@
+addrmap sizes_registers {
+
+    alignment = 4;
+
+    reg {
+        regwidth = 64;
+        accesswidth=32;
+        field { fieldwidth = 32; } field_a;
+        field { fieldwidth = 32; } field_b;
+    } reg_64_32;
+
+    reg {
+        regwidth = 64;
+        accesswidth=16;
+        field { fieldwidth = 16; } field_a;
+        field { fieldwidth = 16; } field_b;
+        field { fieldwidth = 16; } field_c;
+        field { fieldwidth = 16; } field_d;
+
+    } reg_64_16;
+
+    reg {
+        regwidth = 64;
+        accesswidth=8;
+        field { fieldwidth = 8; } field_a;
+        field { fieldwidth = 8; } field_b;
+        field { fieldwidth = 8; } field_c;
+        field { fieldwidth = 8; } field_d;
+        field { fieldwidth = 8; } field_e;
+        field { fieldwidth = 8; } field_f;
+        field { fieldwidth = 8; } field_g;
+        field { fieldwidth = 8; } field_h;
+    } reg_64_8;
+
+    reg {
+        regwidth = 32;
+        accesswidth=32;
+        field { fieldwidth = 16; } field_a;
+        field { fieldwidth = 16; } field_b;
+    } reg_32_32;
+
+    reg {
+        regwidth = 32;
+        accesswidth=16;
+        field { fieldwidth = 16; } field_a;
+        field { fieldwidth = 16; } field_b;
+    } reg_32_16;
+
+    reg {
+        regwidth = 32;
+        accesswidth=8;
+        field { fieldwidth = 8; } field_a;
+        field { fieldwidth = 8; } field_b;
+        field { fieldwidth = 8; } field_c;
+        field { fieldwidth = 8; } field_d;
+    } reg_32_8;
+
+    reg {
+        regwidth = 16;
+        accesswidth=16;
+        field { fieldwidth = 8; } field_a;
+        field { fieldwidth = 8; } field_b;
+    } reg_16_16;
+
+    reg {
+        regwidth = 16;
+        accesswidth=8;
+        field { fieldwidth = 8; } field_a;
+        field { fieldwidth = 8; } field_b;
+    } reg_16_8;
+
+    reg {
+        regwidth = 8;
+        accesswidth=8;
+        field { fieldwidth = 8; } field_a;
+    } reg_8_8;
+
+};

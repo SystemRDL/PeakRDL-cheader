@@ -1,0 +1,54 @@
+addrmap memories {
+
+    external mem {
+        name = "5 entry 32-bit memory";
+        desc = "my little memory";
+        mementries = 5;
+        memwidth = 32;
+    } mem_5_32_named;
+
+    external mem {
+        desc = "my medium memory";
+        mementries = 10;
+        memwidth = 16;
+    } mem_10_16_unnamed;
+
+    external mem {
+        mementries = 15;
+        memwidth = 64;
+    } mem_15_64_unnamed;
+
+    external mem {
+        mementries = 4;
+        memwidth = 32;
+
+    } mem_4_32_array[3];
+
+    external mem {
+        mementries = 2;
+        memwidth = 32;
+        sw = r;
+
+    } mem_2_32_readonly;
+
+    external mem {
+        mementries = 2;
+        memwidth = 32;
+        sw = w;
+
+    } mem_2_32_writeonly;
+
+    external mem {
+        mementries = 2;
+        memwidth = 32;
+        sw = r;
+    } mem_2_32_readonly_array[4];
+
+    external mem {
+        mementries = 2;
+        memwidth = 32;
+        sw = w;
+
+    } mem_2_32_writeonly_array[4];
+
+};

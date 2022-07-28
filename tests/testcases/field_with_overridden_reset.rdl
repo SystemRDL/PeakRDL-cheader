@@ -1,0 +1,50 @@
+field field_typeA { fieldwidth = 2; };
+field field_typeB { fieldwidth = 2; reset = 1; };
+
+signal { signalwidth = 2; } reset_value;
+signal { signalwidth = 1; activehigh = true; } field_four_reset;
+
+
+addrmap field_with_overridden_reset {
+
+    addrmap {
+
+        reg {
+            field_typeA field_a;
+            field_typeA field_a1 = 0;
+            field_typeA field_a2 = 1;
+            field_typeA field_a3 = 0;
+            field_typeA field_a4 = 0;
+
+            field_typeB field_b;
+            field_typeB field_b1 = 0;
+            field_typeB field_b2 = 1;
+            field_typeB field_b3 = 0;
+            field_typeB field_b4 = 0;
+
+            field_a2 -> reset  = 2;
+            field_b2 -> reset  = 2;
+            field_a3 -> reset  = reset_value;
+            field_b3 -> reset  = reset_value;
+
+            field_a4 -> resetsignal = field_four_reset;
+
+
+        } functional_register;
+
+    } main_registers;
+
+    addrmap {
+        reg {
+            field_typeA field_a = 2;
+            field_typeA field_b = 3;
+            field { fieldwidth = 1; } field_b_reset_enable=0;
+        } reset_controls;
+    } reset_values;
+
+    main_registers.functional_register.field_a4 -> reset  = reset_values.reset_controls.field_a;
+    main_registers.functional_register.field_b4 -> reset  = reset_values.reset_controls.field_b;
+
+    main_registers.functional_register.field_b4 -> resetsignal = field_four_reset;
+
+};

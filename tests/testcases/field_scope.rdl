@@ -1,0 +1,18 @@
+
+field outer_basicfield_type { fieldwidth = 2; };
+
+addrmap field_scope {
+
+	field basicfield_type { fieldwidth = 8; };
+
+    reg basic_reg_Type {
+        default sw = rw;
+        default hw = r;
+		basicfield_type field_a[7:0];
+		outer_basicfield_type field_b[9:8];
+        field {} field_c[31:16];
+    };
+	
+	basic_reg_Type reg_a;
+
+};

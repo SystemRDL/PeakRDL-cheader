@@ -1,0 +1,67 @@
+
+enum TopLevel_fourBitFieldType {
+			value1 = 0;
+			value2 = 14;
+			value3 = 10;
+		};
+
+addrmap enum_example {
+
+	enum twoBitFieldType {
+		value1 = 0 { name = "Value 1"; };
+		value2 = 1;
+		value3 = 3 { name = "Value 3"; desc="Does something"; };
+	};
+	
+
+	field basicfield_type { encode = twoBitFieldType; name="first field to use the two bit enum"; };
+	
+
+    reg basic_reg_Type {
+        default sw = rw;
+        default hw = r;
+		basicfield_type field_a[1:0];
+		
+		enum threeBitFieldType {
+			value1 = 0;
+			value2 = 1;
+			value3 = 5;
+		};
+		
+        field { encode = threeBitFieldType; fieldwidth=3; } field_b = {threeBitFieldType::value3};
+		field { encode = twoBitFieldType; name="Another field using TwoBitType"; } field_c[15:14];
+    };
+	
+	basic_reg_Type reg_a;
+	
+	regfile {
+	
+		enum twoBitFieldType {
+				value1 = 2;
+				value2 = 0;
+				value3 = 1;
+		};
+	
+		reg {
+			field { encode = twoBitFieldType; name="alternative definition of two bit field"; } field_d[1:0];
+			field { encode = TopLevel_fourBitFieldType; name="field from a top level definition"; } field_e[6:2];
+			basicfield_type field_f[8:7];
+		}  reg_b;
+			
+	
+	} reg_file_a;
+
+	reg {
+	   field { encode = twoBitFieldType; sw=r; fieldwidth=2; } feild_g;
+	   field { encode = twoBitFieldType; sw=rw; fieldwidth=2; } feild_h;
+	   field { encode = twoBitFieldType; sw=w; fieldwidth=2;} feild_i;
+	} reg_c;
+
+	reg {
+	    default sw = w;
+	    field { encode = twoBitFieldType; sw=w; fieldwidth=2; } feild_j;
+	    field { encode = twoBitFieldType; sw=w; fieldwidth=2; } feild_k;
+	} reg_d;
+    
+
+};

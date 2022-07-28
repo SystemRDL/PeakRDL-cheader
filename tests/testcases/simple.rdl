@@ -1,0 +1,22 @@
+addrmap simple {
+
+    enum value_field {
+			value1 = 0;
+			value2 = 14;
+			value3 = 10;
+		};
+
+    reg {
+        default sw = rw;
+        default hw = r;
+        field {} simple_field_a[15:0];
+        field { encode = value_field; fieldwidth=4; } simple_field_b;
+    } simple_reg_a;
+
+    regfile {
+        reg {
+            field { fieldwidth=1; } simple_regfile_b;
+        } reg_b[2];
+    } simple_regfile_b;
+
+};

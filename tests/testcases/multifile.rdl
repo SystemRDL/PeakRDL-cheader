@@ -1,0 +1,10 @@
+
+addrmap multifile {
+    reg {
+        default sw = rw;
+        default hw = r;
+        field { sw=r; } header[31:0] = 0x1;
+    } header_reg;
+
+    simple simple_regs;
+};

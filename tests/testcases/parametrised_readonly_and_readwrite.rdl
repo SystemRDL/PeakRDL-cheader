@@ -1,0 +1,13 @@
+addrmap parametrised_readonly_and_readwrite {
+
+    reg window_reg #(boolean HW_A = false) {
+        default sw = rw;
+        default hw = r;
+        name = (HW_A) ? "ReadWriteRegister" : "ReadOnly";
+        field { sw = (HW_A) ? rw : r; fieldwidth=2; } field_a;
+    };
+
+    window_reg #(.HW_A(false)) current_register_window;
+    window_reg #(.HW_A(true)) register_windows[2];
+
+};

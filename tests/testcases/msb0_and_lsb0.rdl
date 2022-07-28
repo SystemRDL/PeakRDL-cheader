@@ -1,0 +1,38 @@
+addrmap msb0_and_lsb0 {
+
+    reg {
+
+        default sw = rw;
+        default hw = r;
+        desc = "register with field defined msb0";
+        field {} field_msb_low[0:31];
+    } reg_a;
+
+    reg {
+
+        default sw = rw;
+        default hw = r;
+        desc = "register with field defined lsb0";
+        field {} field_lsb_low[31:0];
+    } reg_b;
+
+    addrmap {
+        msb0;
+
+        enum fourBitFieldType {
+			value1 = 0;
+			value2 = 14;
+			value3 = 10;
+		};
+
+        reg {
+
+            default sw = rw;
+            default hw = r;
+            desc = "register with field defined msb0 in the register definition";
+            field { fieldwidth=16; } field_a;
+            field { encode=fourBitFieldType; fieldwidth=4; } field_b;
+        } reg_c;
+    } msb0_addrmap;
+
+};

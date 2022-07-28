@@ -1,0 +1,52 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8, 3.9, "3.10"]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install .
+        python -m pip install pylint
+        python -m pip install pytest
+        python -m pip install mypy
+
+    - name: Lint with pylint
+      run: pylint --rcfile tests/pylint.rc peakrdl_cheader
+
+    # - name: Typing check with mypy
+    #   run: mypy src/peakrdl_python --config-file=tests/.mypy.ini
+
+    - name: Generate testcases
+      run: |
+        python generate_testcases.py
+        mypy testcase_output/raw --config-file=tests/.mypy.ini
+        # mypy testcase_output/autopep8 --config-file=tests/.mypy.ini
+        pytest testcase_output/raw
+        pytest testcase_output/autopep8

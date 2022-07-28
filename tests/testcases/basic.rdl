@@ -1,0 +1,57 @@
+addrmap basic {
+
+    reg {
+        default sw = rw;
+        default hw = r;
+        field {} basicfield_a[31:0];
+    } basicreg_a;
+
+    reg {
+        default sw = rw;
+        default hw = r;
+        field { sw = r; } basicfield_b[31:16];
+        field {} basicfield_c[15:0];
+    } basicreg_b;
+
+    reg {
+        default sw = r;
+        default hw = r;
+        field { fieldwidth=1;  } basicfield_d[0:0];
+        field {  } basicfield_e[2:1];
+
+    } basicreg_c;
+
+    reg {
+        default sw = w;
+        default hw = r;
+        field { fieldwidth=1;  } basicfield_f[0:0];
+        field {  } basicfield_g[2:1];
+
+    } basicreg_d;
+
+    reg {
+        default sw = rw;
+        default hw = r;
+        field { fieldwidth=8; } basicfield_h;
+        field { fieldwidth=8; } basicfield_i;
+        field { fieldwidth=8; } basicfield_j;
+        field { fieldwidth=8; } basicfield_k;
+    } basicreg_e;
+
+    reg {
+        default sw = rw;
+        default hw = r;
+        field { fieldwidth=8; sw = w; } basicfield_l;
+        field { fieldwidth=8; } basicfield_m;
+        field { fieldwidth=8; sw = w; } basicfield_n;
+    } basicreg_f;
+
+    reg {
+        default sw = rw;
+        default hw = r;
+        field { fieldwidth=8; sw = r; } basicfield_p;
+        field { fieldwidth=8; } basicfield_1;
+        field { fieldwidth=8; sw = r; } basicfield_r;
+    } basicreg_g;
+
+};
