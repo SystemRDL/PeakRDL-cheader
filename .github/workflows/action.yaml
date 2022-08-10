@@ -45,8 +45,7 @@ jobs:
 
     - name: Generate testcases
       run: |
-        python generate_testcases.py
-        mypy testcase_output/raw --config-file=tests/.mypy.ini
-        # mypy testcase_output/autopep8 --config-file=tests/.mypy.ini
-        pytest testcase_output/raw
-        pytest testcase_output/autopep8
+        peakrdl_cheader tests/testcases/basic.rdl --outdir testcase_output/ --top basic
+        gcc testcase_output/basic/tests/test_basic.c -I testcase_output/basic/reg_model -o testcase_output/basic/basic
+        testcase_output/basic/basic
+

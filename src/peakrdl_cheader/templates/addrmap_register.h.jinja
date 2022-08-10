@@ -1,0 +1,8 @@
+{%- macro register_definition(node) %}
+/* ------------------------------------------------------------------------------------------------
+Register definition for: {{get_fully_qualified_type_name(node)}}
+
+{{get_table_block(node)}}
+------------------------------------------------------------------------------------------------ */
+#define DEF_{{get_fully_qualified_type_name(node).upper()}}_SIZE {{node.size}}U
+{%- endmacro -%}

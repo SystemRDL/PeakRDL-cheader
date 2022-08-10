@@ -21,7 +21,7 @@ setup(
     packages=[ 'peakrdl_cheader'],
     package_data={"peakrdl_cheader.templates": ["*.h.jinga"]},
     include_package_data = True,
-    entry_points= { 'console_scripts' : ['peakrdl_cheader=peakrdl_python.peakcheader:main_function'] },
+    entry_points= { 'console_scripts' : ['peakrdl_cheader=peakrdl_cheader.peakcheader:main_function'] },
     install_requires=[
         "systemrdl-compiler>=1.21.0",
         "jinja2",

@@ -1,0 +1,63 @@
+/* ------------------------------------------------------------------------------------------------
+C Headers for the {{top_node.inst_name}} register model
+
+This code was generated from the PeakRDL-CHeader package
+------------------------------------------------------------------------------------------------ */
+
+{%- from 'addrmap_field.h.jinja' import field_definition with context %}
+{%- from 'addrmap_register.h.jinja' import register_definition with context %}
+{%- from 'addrmap_memory.h.jinja' import memory_definition with context %}
+
+{%- macro regfile_or_addr_instance(node) %}
+
+{%- endmacro -%}
+
+{%- macro addrmap_definition(node) %}
+/* ------------------------------------------------------------------------------------------------
+Address definition for: {{get_fully_qualified_type_name(node)}}
+
+{{get_table_block(node)}}
+------------------------------------------------------------------------------------------------ */
+{%- endmacro -%}
+
+#ifndef _{{get_fully_qualified_type_name(top_node).upper()}}_REGS_H_
+#define _{{get_fully_qualified_type_name(top_node).upper()}}_REGS_H_
+{%- for node in get_dependent_component(top_node.parent) -%}
+    {%- if isinstance(node, systemrdlRegNode) %}
+        {{ register_definition(node)  }}
+    {%- elif isinstance(node, systemrdlRegfileNode) %}
+        {{ regfile_definition(node) }}
+    {%- elif isinstance(node, systemrdlAddrmapNode) %}
+        {{ addrmap_definition(node) }}
+    {%- elif isinstance(node, systemrdlFieldNode) %}
+        {{ field_definition(node)  }}
+    {%- elif isinstance(node, systemrdlMemNode) %}
+        {{ memory_definition(node)  }}
+    {%- endif %}
+{% endfor %}
+
+{%- macro register_instance(node) %}
+// Register {{node.inst_name}}
+#define {{node.get_path(hier_separator='_').upper()}}_ADDRESS {{node.absolute_address}}U
+#define {{node.get_path(hier_separator='_').upper()}}_SIZE DEF_{{get_fully_qualified_type_name(node).upper()}}_SIZE // size in bytes
+// Fields in Register {{node.inst_name}}
+{%- for field_node in node.descendants(unroll=True) %}
+#define {{field_node.get_path(hier_separator='_').upper()}}_LSB DEF_{{get_fully_qualified_type_name(field_node).upper()}}_LSB
+#define {{field_node.get_path(hier_separator='_').upper()}}_MSB DEF_{{get_fully_qualified_type_name(field_node).upper()}}_MSB
+#define {{field_node.get_path(hier_separator='_').upper()}}_LOW DEF_{{get_fully_qualified_type_name(field_node).upper()}}_LOW
+#define {{field_node.get_path(hier_separator='_').upper()}}_HIGH DEF_{{get_fully_qualified_type_name(field_node).upper()}}_HIGH
+#define {{field_node.get_path(hier_separator='_').upper()}}_MASK DEF_{{get_fully_qualified_type_name(field_node).upper()}}_MASK
+#define {{field_node.get_path(hier_separator='_').upper()}}_INVMASK DEF_{{get_fully_qualified_type_name(field_node).upper()}}_INVMASK
+#define {{field_node.get_path(hier_separator='_').upper()}}_SIZE DEF_{{get_fully_qualified_type_name(field_node).upper()}}_SIZE // size in bits
+#define {{field_node.get_path(hier_separator='_').upper()}}_DEFAULT DEF_{{get_fully_qualified_type_name(field_node).upper()}}_DEFAULT
+{%- endfor %}
+{%- endmacro -%}
+
+
+{%- for node in top_node.parent.descendants(unroll=True) -%}
+{%- if isinstance(node, systemrdlRegNode) %}
+    {{ register_instance(node)  }}
+{%- endif %}
+{%- endfor %}
+
+#endif /* _{{get_fully_qualified_type_name(top_node).upper()}}_REGS_H_ */

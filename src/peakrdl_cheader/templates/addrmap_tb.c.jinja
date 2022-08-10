@@ -1,0 +1,13 @@
+#include <assert.h>
+#include <stdio.h>
+
+#include "basic.h"
+
+int main() {
+    {%- for node in top_node.parent.descendants(unroll=True) -%}
+    {%- if isinstance(node, systemrdlRegNode) %}
+    printf("checking {{node.get_path(hier_separator='_').upper()}} is at address {{node.absolute_address}}\n");
+    assert({{node.get_path(hier_separator='_').upper()}}_ADDRESS=={{node.absolute_address}}U);
+    {%- endif %}
+    {%- endfor %}
+}

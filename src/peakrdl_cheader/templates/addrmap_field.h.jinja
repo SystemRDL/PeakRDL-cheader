@@ -1,0 +1,15 @@
+{%- macro field_definition(node) %}
+/* ------------------------------------------------------------------------------------------------
+Field definition for: {{get_fully_qualified_type_name(node)}}
+
+{{get_table_block(node)}}
+------------------------------------------------------------------------------------------------ */
+#define DEF_{{get_fully_qualified_type_name(node).upper()}}_LSB {{node.lsb}}U
+#define DEF_{{get_fully_qualified_type_name(node).upper()}}_MSB {{node.msb}}U
+#define DEF_{{get_fully_qualified_type_name(node).upper()}}_LOW {{node.low}}U
+#define DEF_{{get_fully_qualified_type_name(node).upper()}}_HIGH {{node.high}}U
+#define DEF_{{get_fully_qualified_type_name(node).upper()}}_MASK {{get_field_bitmask_hex_string(node)}}U
+#define DEF_{{get_fully_qualified_type_name(node).upper()}}_INVMASK {{get_field_inv_bitmask_hex_string(node)}}U
+#define DEF_{{get_fully_qualified_type_name(node).upper()}}_SIZE {{node.width}}U
+{# #define DEF_{{get_fully_qualified_type_name(node).upper()}}_DEFAULT {{node.default}}U #}
+{%- endmacro -%}
