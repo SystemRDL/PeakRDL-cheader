@@ -4,12 +4,7 @@ Command Line tool for the PeakRDL Python
 
 #!/usr/bin/env python3
 import argparse
-import os
-import subprocess
-import unittest.loader
 from typing import List, Optional
-
-import coverage # type: ignore
 
 from systemrdl import RDLCompiler # type: ignore
 from systemrdl.node import Node, AddrmapNode # type: ignore
@@ -40,20 +35,8 @@ def build_command_line_parser() -> argparse.ArgumentParser:
                              'global addrmap)')
     parser.add_argument('--verbose', '-v', action='count', default=0,
                         help='set logging verbosity')
-    parser.add_argument('--autoformat', action='store_true',
-                        help='use autopep8 on generated code')
     parser.add_argument('--ipxact', dest='ipxact', nargs='*',
                         type=str)
-
-    checker = parser.add_argument_group('post-generate checks')
-    checker.add_argument('--lint', action='store_true',
-                         help='run pylint on the generated python')
-    checker.add_argument('--test', action='store_true',
-                         help='run unittests for the created')
-    checker.add_argument('--coverage', action='store_true',
-                         help='run a coverage report on the unittests')
-    checker.add_argument('--html_coverage_out',
-                         help='output director (default: %(default)s)')
 
     return parser
 
@@ -108,22 +91,6 @@ def generate(root:Node, outdir:str) -> List[str]:
 
     return modules
 
-def run_lint(root, outdir):
-    """
-    Run the lint checks using pylint on a directory
-
-    Args:
-        root: name of the generated package (directory)
-        outdir: location where the package has been written
-
-    Returns:
-
-    """
-    subprocess.run(['pylint', '--rcfile',
-                    os.path.join('tests','pylint.rc'),
-                    os.path.join(outdir, root)],
-                   check=False)
-
 def main_function():
     """
     Main function for the Command Line tool, this needs to be separated out so that it can be
@@ -147,33 +114,6 @@ def main_function():
     print('* Generate the Python Package                                 *')
     print('***************************************************************')
     generate(spec, args.outdir)
-
-    if args.lint:
-        print('***************************************************************')
-        print('* Lint Checks                                                 *')
-        print('***************************************************************')
-        run_lint(outdir=args.outdir, root=spec.inst_name)
-    if args.test:
-        print('***************************************************************')
-        print('* Unit Test Run                                               *')
-        print('***************************************************************')
-        if args.coverage:
-            cov = coverage.Coverage(
-                include=[f'*\\{spec.inst_name}\\reg_model\\*.py',
-                         f'*\\{spec.inst_name}\\tests\\*.py'])
-            cov.start()
-        tests = unittest.TestLoader().discover(
-            start_dir=os.path.join(args.outdir, spec.inst_name, 'tests'),
-            top_level_dir=args.outdir)
-        runner = unittest.TextTestRunner()
-        runner.run(tests)
-
-        if args.coverage:
-            cov.stop()
-
-        if args.html_coverage_out is not None:
-            cov.html_report(directory=args.html_coverage_out)
-
 
 if __name__ == '__main__':
     main_function()

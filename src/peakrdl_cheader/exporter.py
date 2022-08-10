@@ -3,9 +3,7 @@ Blah Blah
 """
 import os
 from pathlib import Path
-from shutil import copyfile
 from typing import List
-from glob import glob
 
 import jinja2 as jj
 
@@ -209,4 +207,3 @@ class CHeaderExporter:
         Path(package_path).mkdir(parents=True, exist_ok=True)
         Path(os.path.join(package_path, 'reg_model')).mkdir(parents=True, exist_ok=True)
         Path(os.path.join(package_path, 'tests')).mkdir(parents=True, exist_ok=True)
-
