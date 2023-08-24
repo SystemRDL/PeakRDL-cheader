@@ -58,7 +58,6 @@ jobs:
   build_sdist:
     needs:
       - tests
-      -
     name: Build source distribution
     runs-on: ubuntu-latest
     steps:
