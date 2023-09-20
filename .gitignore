@@ -1,2 +1,11 @@
-/doc_out/
-/release_script.bat
+**/__pycache__
+**/.vscode
+build/
+dist/
+*.egg-info/
+.coverage
+build/
+dist/
+*.egg-info/
+.eggs/
+**/.venv

@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "peakrdl-cheader"
+dynamic = ["version"]
+requires-python = ">=3.7"
+dependencies = [
+    "systemrdl-compiler >= 1.21.0, < 2",
+    "jinja2",
+]
+
+authors = [
+    {name="Alex Mykyta"},
+    {name="Keith Brady"},
+]
+description = "Generate C Header files from a SystemRDL register model"
+readme = "README.md"
+license = {file = "LICENSE"}
+# TODO: keywords = ["foo", "bar"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3 :: Only",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+]
+
+[project.urls]
+Source = "https://github.com/SystemRDL/PeakRDL-cheader"
+Tracker = "https://github.com/SystemRDL/PeakRDL-cheader/issues"
+Changelog = "https://github.com/SystemRDL/PeakRDL-cheader/releases"
+Documentation = "https://peakrdl-cheader.readthedocs.io/"
+
+[tool.setuptools.dynamic]
+version = {attr = "peakrdl_cheader.__about__.__version__"}
+
+[project.entry-points."peakrdl.exporters"]
+c-header = "peakrdl_cheader.__peakrdl__:Exporter"

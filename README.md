@@ -1,10 +1,11 @@
-![CI](https://github.com/krcb197/PeakRDL-cheader/actions/workflows/action.yaml/badge.svg)
-[![Documentation Status](https://readthedocs.org/projects/peakrdl-cheader/badge/?version=latest)](https://peakrdl-python.readthedocs.io/en/latest/?badge=latest)
+[![Documentation Status](https://readthedocs.org/projects/peakrdl-cheader/badge/?version=latest)](https://peakrdl-python.readthedocs.io)
+[![build](https://github.com/SystemRDL/PeakRDL-cheader/actions/workflows/action/badge.svg)](https://github.com/SystemRDL/PeakRDL-cheader/actions/workflows/action.yaml?query=branch%3Amain)
+[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/peakrdl-cheader.svg)](https://pypi.org/project/peakrdl-cheader)
 
-# PeakRDL CHeader
-Generate C Header files for a register model compiled SystemRDL input
+# PeakRDL C Header
+Generate C Header files from a SystemRDL register model.
+
+For the command line tool, see the [PeakRDL project](https://peakrdl.readthedocs.io).
 
 ## Documentation
-See the [PeakRDL CHeader Documentation](https://peakrdl-cheader.readthedocs.io/) for more details
-
-
+See the [PeakRDL C Header Documentation](https://peakrdl-cheader.readthedocs.io) for more details
