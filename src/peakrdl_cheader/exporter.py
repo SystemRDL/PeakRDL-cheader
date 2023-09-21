@@ -1,23 +1,12 @@
 from typing import Any, Union
-import os
-import re
 
-import jinja2 as jj
-from systemrdl.node import RootNode, AddrmapNode
+from systemrdl.node import RootNode, AddrmapNode, MemNode, RegfileNode
 
 from .design_state import DesignState
 from .design_scanner import DesignScanner
-from .generators import DefGenerator
-from . import utils
+from .header_generator import HeaderGenerator
 
 class CHeaderExporter:
-    def __init__(self) -> None:
-        loader = jj.FileSystemLoader(os.path.join(os.path.dirname(__file__), "templates"))
-        self.jj_env = jj.Environment(
-            loader=loader,
-            undefined=jj.StrictUndefined
-        )
-
     def export(self, node: Union[RootNode, AddrmapNode], path: str, **kwargs: Any) -> None:
         """
         Parameters
@@ -48,6 +37,17 @@ class CHeaderExporter:
             header will represent it using an array of smaller sub-words.
             Set the desired sub-word size.
             Shall be 8, 16, 32 or 64.
+        explode_top: bool
+            If set, the top-level hiearchy is skipped. Instead, definitions for
+            all the direct children are generated.
+
+            Note that only block-like definitons are generated.
+            i.e: children that are registers are skipped.
+        instantiate: bool
+            If set, header will also include a macro that instantiates each top-level
+            block at a defined hardware address, allowing for direct access.
+        inst_offset: int
+            Apply an additional address offset to instance definitions.
         """
         # If it is the root node, skip to top addrmap
         if isinstance(node, RootNode):
@@ -55,45 +55,25 @@ class CHeaderExporter:
         else:
             top_node = node
 
-        self.ds = DesignState(top_node, kwargs)
+        ds = DesignState(top_node, kwargs)
 
         # Check for stray kwargs
         if kwargs:
             raise TypeError(f"got an unexpected keyword argument '{list(kwargs.keys())[0]}'")
 
         # Validate and collect info for export
-        DesignScanner(self.ds).run()
+        DesignScanner(ds).run()
 
-        # TODO: Add option to explode top-level
-        top_nodes = [
-            top_node,
-        ]
-
-        context = {
-            "ds": self.ds,
-            "header_guard_def": re.sub(r"[^\w]", "_", os.path.basename(path)).upper(),
-            "top_nodes": top_nodes,
-            "get_struct_name": utils.get_struct_name,
-        }
+        top_nodes = []
+        if ds.explode_top:
+            for child in top_node.children():
+                if isinstance(child, (AddrmapNode, MemNode, RegfileNode)):
+                    top_nodes.append(child)
+        else:
+            top_nodes.append(top_node)
 
         # Write output
-        with open(path, "w", encoding='utf-8') as f:
-            # Stream header via jinja
-            template = self.jj_env.get_template("header.h")
-            template.stream(context).dump(f)
-            f.write("\n")
+        HeaderGenerator(ds).run(path, top_nodes)
 
-            def_gen = DefGenerator(self.ds)
-            for node in top_nodes:
-                def_gen.stream(f, node)
-
-            # TODO: add optional "bare metal" exports
-
-            # Stream footer via jinja
-            template = self.jj_env.get_template("footer.h")
-            template.stream(context).dump(f)
-
-            # Ensure newline before EOF
-            f.write("\n")
 
         # TODO: Write out optional testcase C file

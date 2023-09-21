@@ -1,12 +1,15 @@
 from typing import TextIO, Set, Optional, List
+import os
+import re
+
 from systemrdl.walker import RDLListener, RDLWalker, WalkerAction
-from systemrdl.node import AddrmapNode, AddressableNode, RegNode, FieldNode, Node
+from systemrdl.node import AddrmapNode, AddressableNode, RegNode, FieldNode, Node, MemNode
 
 from .design_state import DesignState
 from .identifier_filter import kw_filter as kwf
 from . import utils
 
-class DefGenerator(RDLListener):
+class HeaderGenerator(RDLListener):
     def __init__(self, ds: DesignState) -> None:
         self.ds = ds
 
@@ -20,11 +23,49 @@ class DefGenerator(RDLListener):
         self.f: TextIO
         self.f = None
 
-    def stream(self, f: TextIO, root_node: AddrmapNode) -> None:
-        self.root_node = root_node
-        self.f = f
-        RDLWalker().walk(root_node, self)
+    def run(self, path: str, top_nodes: List[AddrmapNode]) -> None:
+        with open(path, "w", encoding='utf-8') as f:
+            self.f = f
 
+            context = {
+                "ds": self.ds,
+                "header_guard_def": re.sub(r"[^\w]", "_", os.path.basename(path)).upper(),
+                "top_nodes": top_nodes,
+                "get_struct_name": utils.get_struct_name,
+            }
+
+            # Stream header via jinja
+            template = self.ds.jj_env.get_template("header.h")
+            template.stream(context).dump(f)
+            f.write("\n")
+
+            # Generate definitions
+            for node in top_nodes:
+                self.root_node = node
+                RDLWalker().walk(node, self)
+
+            # Write direct instance definitions
+            if self.ds.instantiate:
+                f.write("\n// Instances\n")
+                for node in top_nodes:
+                    addr = node.raw_absolute_address - node.raw_absolute_address + self.ds.inst_offset
+                    type_name = utils.get_struct_name(self.ds, node, node)
+                    if node.is_array:
+                        if len(node.array_dimensions) > 1:
+                            node.env.msg.fatal(
+                                f"C header generator does not support instance defines for multi-dimensional arrays: {node.inst_name}{node.array_dimensions}",
+                                node.inst.inst_src_ref
+                            )
+                        f.write(f"#define {node.inst_name} ((volatile {type_name} *){addr:#x}UL)\n")
+                    else:
+                        f.write(f"#define {node.inst_name} (*(volatile {type_name} *){addr:#x}UL)\n")
+
+            # Stream footer via jinja
+            template = self.ds.jj_env.get_template("footer.h")
+            template.stream(context).dump(f)
+
+            # Ensure newline before EOF
+            f.write("\n")
 
     def push_indent(self) -> None:
         self.indent_level += 1
@@ -165,10 +206,50 @@ class DefGenerator(RDLListener):
 
 
     def exit_AddressableComponent(self, node: AddressableNode) -> None:
-        if isinstance(node, RegNode):
-            # Registers handled elsewhere
+        if isinstance(node, (RegNode, MemNode)):
+            # Registers and Mem handled elsewhere
             return
 
+        self.write_block(node)
+
+    def exit_Mem(self, node: MemNode) -> None:
+
+        for _ in node.registers():
+            has_vregs = True
+            break
+        else:
+            has_vregs = False
+
+
+        if has_vregs:
+            # Contains virtual registers.
+            # Write out as if it is a regular block
+            self.write_block(node)
+            return
+
+        # otherwise, write out an array of words of memwidth
+        struct_name = self.get_struct_name(node)
+        if struct_name in self.defined_namespace:
+            # Already defined. Skip
+            return
+        self.defined_namespace.add(struct_name)
+
+        self.write(f"\n// {self.get_friendly_name(node)}\n")
+
+        self.write("typedef struct __attribute__ ((__packed__)) {\n")
+        self.push_indent()
+
+        width = utils.roundup_pow2(node.get_property("memwidth"))
+        if width > 64:
+            n_subwords = width // self.ds.wide_reg_subword_size
+            self.write(f"uint{self.ds.wide_reg_subword_size}_t mem[{node.get_property('mementries')}][{n_subwords}];\n")
+        else:
+            self.write(f"uint{width}_t mem[{node.get_property('mementries')}];\n")
+
+        self.pop_indent()
+        self.write(f"}} {struct_name};\n")
+
+    def write_block(self, node: AddressableNode) -> None:
         struct_name = self.get_struct_name(node)
         if struct_name in self.defined_namespace:
             # Already defined. Skip
@@ -227,7 +308,7 @@ class DefGenerator(RDLListener):
             self.write_byte_padding(current_offset, padding)
 
         self.pop_indent()
-        self.write(f"}} {struct_name};")
+        self.write(f"}} {struct_name};\n")
 
 
     def write_byte_padding(self, start_offset: int, size: int) -> None:

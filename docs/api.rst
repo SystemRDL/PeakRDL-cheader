@@ -1,10 +1,12 @@
+.. _python_api:
+
 Python API
 ==========
 
 Example
 -------
 
-The following example shows the compiling an SystemRDL file and then generating
+The following example shows how to compile a SystemRDL file and then generate
 the C header using the Python API.
 
 .. code-block:: python
@@ -14,8 +16,8 @@ the C header using the Python API.
 
     # compile the SystemRDL
     rdlc = RDLCompiler()
-    rdlc.compile_file('basic.rdl')
-    top = rdlc.elaborate(top_def_name='basic').top
+    rdlc.compile_file('example.rdl')
+    top = rdlc.elaborate()
 
     # generate the C header
     exporter = CHeaderExporter()

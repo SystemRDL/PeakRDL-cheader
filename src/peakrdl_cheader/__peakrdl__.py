@@ -31,7 +31,7 @@ class Exporter(ExporterSubcommandPlugin):
         )
 
         arg_group.add_argument(
-            "--bitfields",
+            "-b", "--bitfields",
             choices=["ltoh", "htol", "none"],
             default=None,
             help="""
@@ -40,6 +40,42 @@ class Exporter(ExporterSubcommandPlugin):
 
             Since the packing order of C struct bitfields is implementation defined, the
             packing order must be explicitly specified. [none]
+            """
+        )
+
+        arg_group.add_argument(
+            "-x", "--explode-top",
+            action="store_true",
+            default=False,
+            help=""""
+            If set, the top-level hiearchy is skipped. Instead, definitions for
+            all the direct children are generated.
+
+            Note that only block-like definitons are generated.
+            i.e: children that are registers are skipped.
+            """
+        )
+
+        arg_group.add_argument(
+            "-i", "--instantiate",
+            action="store_true",
+            default=False,
+            help=""""
+            If set, header will also include a macro that instantiates each top-level
+            block at a defined hardware address, allowing for direct access.
+            """
+        )
+
+        # Wrap constructor to allow hex strings
+        def integer(n):
+            return int(n, 0)
+
+        arg_group.add_argument(
+            "--inst-offset",
+            type=integer,
+            default=0,
+            help="""
+            Apply an additional address offset to instance definitions.
             """
         )
 
@@ -90,4 +126,7 @@ class Exporter(ExporterSubcommandPlugin):
             bitfield_order_ltoh=bitfield_order_ltoh,
             reuse_typedefs=reuse_typedefs,
             wide_reg_subword_size=subword_size,
+            explode_top=options.explode_top,
+            instantiate=options.instantiate,
+            inst_offset=options.inst_offset,
         )
