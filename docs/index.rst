@@ -31,4 +31,6 @@ Otherwise, if you want to embed this tool into your own script there is a :ref:`
     :hidden:
 
     self
+    configuring
     api
+    licensing
