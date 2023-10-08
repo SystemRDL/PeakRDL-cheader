@@ -5,6 +5,7 @@ from systemrdl.node import RootNode, AddrmapNode, MemNode, RegfileNode
 from .design_state import DesignState
 from .design_scanner import DesignScanner
 from .header_generator import HeaderGenerator
+from .testcase_generator import TestcaseGenerator
 
 class CHeaderExporter:
     def export(self, node: Union[RootNode, AddrmapNode], path: str, **kwargs: Any) -> None:
@@ -48,6 +49,8 @@ class CHeaderExporter:
             block at a defined hardware address, allowing for direct access.
         inst_offset: int
             Apply an additional address offset to instance definitions.
+        testcase: bool
+            Generate a testcase C file
         """
         # If it is the root node, skip to top addrmap
         if isinstance(node, RootNode):
@@ -74,6 +77,5 @@ class CHeaderExporter:
 
         # Write output
         HeaderGenerator(ds).run(path, top_nodes)
-
-
-        # TODO: Write out optional testcase C file
+        if ds.testcase:
+            TestcaseGenerator(ds).run(path, top_nodes)

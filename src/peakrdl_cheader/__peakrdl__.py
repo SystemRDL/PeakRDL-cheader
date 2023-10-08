@@ -104,6 +104,15 @@ class Exporter(ExporterSubcommandPlugin):
             """
         )
 
+        arg_group.add_argument(
+            "--testcase",
+            action="store_true",
+            default=False,
+            help="""
+            Create a testcase C file that validates the header
+            """
+        )
+
     def do_export(self, top_node: 'AddrmapNode', options: 'argparse.Namespace') -> None:
         std_name = options.std or self.cfg['std'] or "latest"
         std = CStandard[std_name]
@@ -129,4 +138,5 @@ class Exporter(ExporterSubcommandPlugin):
             explode_top=options.explode_top,
             instantiate=options.instantiate,
             inst_offset=options.inst_offset,
+            testcase=options.testcase,
         )

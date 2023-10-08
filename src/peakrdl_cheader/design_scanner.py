@@ -26,11 +26,13 @@ class DesignScanner(RDLListener):
 
 
     def enter_AddressableComponent(self, node: AddressableNode) -> Optional[WalkerAction]:
-        self.prev_reg_stack.append(None)
+        if not isinstance(node, RegNode):
+            self.prev_reg_stack.append(None)
         return WalkerAction.Continue
 
     def exit_AddressableComponent(self, node: AddressableNode) -> Optional[WalkerAction]:
-        self.prev_reg_stack.pop()
+        if not isinstance(node, RegNode):
+            self.prev_reg_stack.pop()
         return WalkerAction.Continue
 
     def enter_Reg(self, node: RegNode) -> Optional[WalkerAction]:
@@ -89,3 +91,6 @@ class DesignScanner(RDLListener):
             )
 
         return WalkerAction.SkipDescendants
+
+    def exit_Reg(self, node: RegNode) -> None:
+        self.prev_reg_stack[-1] = node

@@ -48,7 +48,7 @@ class HeaderGenerator(RDLListener):
             if self.ds.instantiate:
                 f.write("\n// Instances\n")
                 for node in top_nodes:
-                    addr = node.raw_absolute_address - node.raw_absolute_address + self.ds.inst_offset
+                    addr = node.raw_absolute_address + self.ds.inst_offset
                     type_name = utils.get_struct_name(self.ds, node, node)
                     if node.is_array:
                         if len(node.array_dimensions) > 1:

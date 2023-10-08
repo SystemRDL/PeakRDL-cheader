@@ -30,6 +30,7 @@ class DesignState:
         #------------------------
         # Extract compiler args
         #------------------------
+        self.std: CStandard
         self.std = kwargs.pop("std", CStandard.latest)
         assert isinstance(self.std, CStandard)
 
@@ -58,3 +59,6 @@ class DesignState:
 
         self.inst_offset: int
         self.inst_offset = kwargs.pop("inst_offset", 0)
+
+        self.testcase: bool
+        self.testcase = kwargs.pop("testcase", False)
