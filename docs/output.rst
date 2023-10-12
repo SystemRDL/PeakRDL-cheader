@@ -3,6 +3,7 @@ Generated Header Contents
 
 Block Structs
 -------------
+TODO: Add details. possible unions, anon unions
 
 Bit-fiddling Field Macros
 -------------------------
@@ -46,3 +47,7 @@ Register bitfield structs
 If enabled, each register is represented by a nested union & struct definition.
 This allows a register value to be accessed in aggregate, or by its individual
 bit-fields.
+
+TODO: Add details. union structure. Overlapping fields
+
+TODO: Add section on wide regs?

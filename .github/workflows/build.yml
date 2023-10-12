@@ -19,13 +19,21 @@ jobs:
     strategy:
       matrix:
         python-version:
+          - 3.6
           - 3.7
           - 3.8
           - 3.9
           - "3.10"
           - "3.11"
+          - "3.12"
+        include:
+          - os: ubuntu-latest
 
-    runs-on: ubuntu-latest
+          # older versions need older OS
+          - python-version: 3.6
+            os: ubuntu-20.04
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v3
@@ -37,10 +45,41 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install pytest
+          python -m pip install -U -r tests/requirements.txt
 
+      - name: Install
+        run: |
+          python -m pip install .
 
-      # TODO: Add actual testcase
+      - name: Test
+        run: |
+          cd tests
+          pytest --cov=peakrdl_cheader
+
+      - name: Coveralls
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERALLS_PARALLEL: true
+        run: |
+          cd tests
+          coveralls --service=github
+
+  finish_coveralls:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Coveralls
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          COVERALLS_PARALLEL: true
+        run: |
+          python -m pip install -U coveralls>=3.0.0
+          coveralls --service=github --finish
 
 #-------------------------------------------------------------------------------
   lint:

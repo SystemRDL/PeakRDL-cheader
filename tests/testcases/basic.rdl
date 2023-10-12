@@ -26,6 +26,7 @@ addrmap basic {
         default hw = r;
         field { fieldwidth=1;  } basicfield_f[0:0];
         field {  } basicfield_g[2:1];
+        field {  } case[5:4]; // collide with C keyword
 
     } basicreg_d;
 

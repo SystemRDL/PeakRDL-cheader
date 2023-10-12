@@ -124,8 +124,8 @@ class HeaderGenerator(RDLListener):
                 self.write(f"uint{regwidth}_t {kwf(field.inst_name)} :{field.width:d};\n")
                 current_offset -= field.width
 
-            if current_offset > 0:
-                self.write(f"uint{regwidth}_t :{current_offset:d};\n")
+            if current_offset > -1:
+                self.write(f"uint{regwidth}_t :{current_offset + 1:d};\n")
 
         self.pop_indent()
         self.write(f"}} {grp_name};\n")

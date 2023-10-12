@@ -1,0 +1,7 @@
+pytest
+pytest-xdist
+parameterized
+pylint
+mypy
+pytest-cov
+coveralls>=3.0.0

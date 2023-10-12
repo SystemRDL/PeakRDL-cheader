@@ -1,0 +1,23 @@
+mem mem_empty #(
+    longint WIDTH = 32
+){
+    memwidth = WIDTH;
+    mementries = 16;
+};
+
+
+addrmap top {
+    reg wide_reg {
+        regwidth = 128;
+        field {} f1[32];
+        field {} f2[32];
+        field {} f3[32];
+        field {} f4[32];
+    };
+
+    wide_reg r1;
+    wide_reg r2[4];
+    wide_reg r3;
+
+    external mem_empty #(.WIDTH(128)) mem_empty_128;
+};

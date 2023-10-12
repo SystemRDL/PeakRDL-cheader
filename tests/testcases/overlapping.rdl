@@ -1,0 +1,24 @@
+addrmap top {
+    reg {
+        field f_rw {sw=rw; hw=r;};
+        field f_r {sw=r; hw=w;};
+        field f_w {sw=w; hw=r;};
+
+        f_rw f1[0:0] = 0;
+        f_r f2[1:1];
+        f_w f3[1:1];
+    } overlap_fields;
+
+    reg r_rw {
+        field {sw=rw; hw=r;} f[8];
+    };
+    reg r_r {
+        field {sw=r; hw=w;} f[8];
+    };
+    reg r_w {
+        field {sw=w; hw=r;} f[8];
+    };
+    r_rw r1 @ 0x10;
+    r_r r2 @ 0x14;
+    r_w r3 @ 0x14;
+};

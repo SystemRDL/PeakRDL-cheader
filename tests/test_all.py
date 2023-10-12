@@ -1,17 +1,23 @@
+import glob
+
 import base
 
 from parameterized import parameterized_class
-from peakrdl_cheader.c_standards import CStandard
 
-cstds = set(CStandard)
-cstds.remove(CStandard.gnu23) # Not available yet
+exceptions = [
+    "testcases/wide_regs.rdl",
+]
+files = glob.glob("testcases/*.rdl")
+files = [file for file in files if not file in exceptions]
 
 @parameterized_class(base.get_permutations({
-    "rdl_file": ["testcases/basic.rdl"],
-    "std": cstds,
+    "rdl_file": files,
+    "std": base.ALL_CSTDS,
     "generate_bitfields": [True, False],
     "reuse_typedefs": [True, False],
     "explode_top": [True, False],
+    "instantiate": [True, False],
 }))
 class TestAll(base.BaseHeaderTestcase):
-    pass
+    def test_all(self) -> None:
+        self.do_test()

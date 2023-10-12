@@ -1,11 +1,13 @@
-from typing import List, TextIO, Set
+from typing import List, TextIO, Set, Match
 import os
+import re
 
-from systemrdl.walker import RDLListener, RDLWalker, WalkerAction
+from systemrdl.walker import RDLListener, RDLWalker
 from systemrdl.node import AddrmapNode, RegNode, AddressableNode
 
 from .design_state import DesignState
 from . import utils
+from .identifier_filter import kw_filter as kwf
 
 class TestcaseGenerator:
     def __init__(self, ds: DesignState) -> None:
@@ -57,6 +59,7 @@ class OffsetTestsGenerator(RDLListener):
         f.write("static void test_offsets(void){\n")
         self.push_indent()
         for node in top_nodes:
+            node.zero_lineage_index()
             self.root_node = node
             self.root_struct_name = utils.get_struct_name(self.ds, node, node)
             RDLWalker(unroll=True).walk(node, self)
@@ -111,20 +114,26 @@ class OffsetTestsGenerator(RDLListener):
         else:
             member = node.get_rel_path(self.root_node)
 
+        # Sanitize keywords
+        def kwrepl(m: Match) -> str:
+            return kwf(m.group(0))
+        member = re.sub(r"\w+", kwrepl, member)
+
         if self.ds.generate_bitfields:
             # Reg is defined as a bitfield union. Access entire word member
             member += ".w"
 
         regwidth = node.get_property('regwidth')
+        node_addr = node.absolute_address - self.root_node.absolute_address
         if regwidth > 64:
             # Reg is split into an array of subwords
             n_subwords = regwidth // self.ds.wide_reg_subword_size
             stride = self.ds.wide_reg_subword_size // 8
             for i in range(n_subwords):
-                addr = f"{node.absolute_address + i * stride:#x}UL"
+                addr = f"{node_addr + i * stride:#x}UL"
                 self.write(f"assert(offsetof({self.root_struct_name}, {member}[{i}]) == {addr});\n")
         else:
-            self.write(f"assert(offsetof({self.root_struct_name}, {member}) == {node.absolute_address:#x}UL);\n")
+            self.write(f"assert(offsetof({self.root_struct_name}, {member}) == {node_addr:#x}UL);\n")
 
 
 
@@ -202,7 +211,7 @@ class BitfieldTestsGenerator(RDLListener):
             for field in fields:
                 field_prefix = prefix + "__" + field.inst_name.upper()
                 self.write("reg.w = 0;\n")
-                self.write(f"reg.{grp_name}.{field.inst_name} = {(1 << field.width) - 1:#x};\n")
+                self.write(f"reg.{grp_name}.{kwf(field.inst_name)} = {(1 << field.width) - 1:#x};\n")
                 self.write(f"assert(reg.w == {field_prefix}_bm);\n")
         self.pop_indent()
         self.write("}\n")

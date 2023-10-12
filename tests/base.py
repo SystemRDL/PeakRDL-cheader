@@ -15,7 +15,7 @@ def get_permutations(spec):
     return param_list
 
 class BaseHeaderTestcase(TestCase):
-    rdl_file = "testcases/basic.rdl"
+    rdl_file = ""
 
     # Export parameters
     std = CStandard.latest
@@ -24,20 +24,34 @@ class BaseHeaderTestcase(TestCase):
     reuse_typedefs = True
     wide_reg_subword_size = 32
     explode_top = False
+    instantiate = False
 
     @classmethod
     def get_run_dir(cls) -> str:
         this_dir = os.path.dirname(__file__)
-        run_dir = os.path.join(this_dir, cls.__name__ + ".out")
+        run_dir = os.path.join(this_dir, "test.out", cls.__name__)
         return run_dir
 
     @property
     def output_dir(self) -> str:
         return self.get_run_dir()
 
+    @classmethod
+    def _write_params(cls) -> None:
+        """
+        Write out the class parameters to a file so that it is easier to debug
+        how a testcase was parameterized
+        """
+        path = os.path.join(cls.get_run_dir(), "params.txt")
+
+        with open(path, 'w') as f:
+            for k, v in cls.__dict__.items():
+                if k.startswith("_") or callable(v):
+                    continue
+                f.write(f"{k}: {repr(v)}\n")
+
     def do_export(self):
-        if not os.path.exists(self.output_dir):
-            os.mkdir(self.output_dir)
+        os.makedirs(self.output_dir, exist_ok=True)
 
         rdl_path = os.path.join(os.path.dirname(__file__), self.rdl_file)
 
@@ -55,10 +69,12 @@ class BaseHeaderTestcase(TestCase):
             reuse_typedefs=self.reuse_typedefs,
             wide_reg_subword_size=self.wide_reg_subword_size,
             explode_top=self.explode_top,
-            instantiate=False,
+            instantiate=self.instantiate,
             inst_offset=0,
             testcase=True,
         )
+
+        self._write_params()
 
     def do_compile(self):
         args = [
@@ -81,7 +97,11 @@ class BaseHeaderTestcase(TestCase):
         print(ret.stderr.decode('utf-8'))
         self.assertEqual(ret.returncode, 0)
 
-    def test_me(self):
+    def do_test(self):
         self.do_export()
         self.do_compile()
         self.do_run()
+
+
+ALL_CSTDS = set(CStandard)
+ALL_CSTDS.remove(CStandard.gnu23) # Not available yet

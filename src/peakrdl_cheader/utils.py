@@ -3,14 +3,8 @@ from .design_state import DesignState
 
 def get_node_prefix(ds: DesignState, root_node: AddrmapNode, node: AddressableNode) -> str:
     if ds.reuse_typedefs:
-        prefix = node.inst.get_scope_path("__")
-        if prefix is not None:
-            # Complete the scope path
-            if prefix == "":
-                prefix = node.type_name
-            else:
-                prefix += "__" + node.type_name
-        else:
+        prefix = node.get_global_type_name("__")
+        if prefix is None:
             # Unable to determine a reusable type name. Fall back to hierarchical path
             # Add prefix to prevent collision when mixing namespace methods
             prefix = "xtern__" + node.get_rel_path(
@@ -46,14 +40,9 @@ def get_friendly_name(ds: DesignState, root_node: AddrmapNode, node: Node) -> st
     a comment
     """
     if ds.reuse_typedefs:
-        scope_path = node.inst.get_scope_path()
+        friendly_name = node.get_global_type_name("::")
 
-        if scope_path is not None and node.type_name is not None:
-            if scope_path == "":
-                friendly_name = node.type_name
-            else:
-                friendly_name = scope_path + "::" + node.type_name
-        else:
+        if friendly_name is None:
             # Unable to determine a reusable type name. Fall back to hierarchical path
             friendly_name = node.get_rel_path(root_node.parent)
     else:

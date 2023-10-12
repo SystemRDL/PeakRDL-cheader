@@ -1,0 +1,77 @@
+regfile rf1 #(
+    longint WIDTH = 32
+){
+    default regwidth = WIDTH;
+    reg myreg1 {
+        field {} f1[WIDTH/4];
+        field {} f2[WIDTH/4];
+        field {} f3[WIDTH/4];
+        field {} f4[WIDTH/4];
+    };
+    reg myreg2 {
+        field {} f1[WIDTH/8];
+        field {} f2[WIDTH/8];
+        field {} f3[WIDTH/8];
+        field {} f4[WIDTH/8];
+    };
+    reg myreg3 {
+        field {} f1[1:1];
+        field {} f2[4:3] = 3;
+        field {} f3[6:5] = 2;
+    };
+
+    myreg1 r1 @ 0x100;
+    myreg2 r2[3];
+    myreg3 r3[5];
+
+    myreg1 r4 @ 0x200;
+    myreg2 r5;
+    myreg3 r6;
+};
+
+
+mem mem_empty #(
+    longint WIDTH = 32
+){
+    memwidth = WIDTH;
+    mementries = 16;
+};
+
+mem mem_vregs #(
+    longint WIDTH = 32
+){
+    memwidth = WIDTH;
+    mementries = 16;
+    reg myreg {
+        regwidth = WIDTH;
+        field {} f1[WIDTH/2];
+        field {} f2[WIDTH/4];
+        field {} f3[WIDTH/8];
+        field {} f4[WIDTH/8];
+    };
+    myreg r1[8];
+    myreg r2;
+    myreg r3[6];
+    myreg r4;
+};
+
+
+addrmap top {
+    rf1 #(.WIDTH(8)) rf1_8;
+    rf1 #(.WIDTH(16)) rf1_16;
+    rf1 #(.WIDTH(32)) rf1_32;
+    rf1 #(.WIDTH(64)) rf1_64;
+    rf1 #(.WIDTH(8)) rf1_8_again;
+
+    external mem_empty #(.WIDTH(8)) mem_empty_8;
+    external mem_empty #(.WIDTH(16)) mem_empty_16;
+    external mem_empty #(.WIDTH(32)) mem_empty_32;
+    external mem_empty #(.WIDTH(64)) mem_empty_64;
+    external mem_empty #(.WIDTH(8)) mem_empty_8_again;
+
+    external mem_vregs #(.WIDTH(8)) mem_vregs_8;
+    external mem_vregs #(.WIDTH(16)) mem_vregs_16;
+    external mem_vregs #(.WIDTH(32)) mem_vregs_32;
+    external mem_vregs #(.WIDTH(64)) mem_vregs_64;
+    external mem_vregs #(.WIDTH(8)) mem_vregs_8_again;
+};
