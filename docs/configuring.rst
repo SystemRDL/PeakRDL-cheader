@@ -14,6 +14,7 @@ For example:
     [c-header]
     std = "gnu17"
     type_style = "lexical"
+    subword_size = 32
     bitfields = "ltoh"
 
 

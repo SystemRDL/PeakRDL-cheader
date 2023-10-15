@@ -2,6 +2,9 @@
 
 Python API
 ==========
+If you want to embed this tool into your own script, you can do so with the
+following API.
+
 
 Example
 -------

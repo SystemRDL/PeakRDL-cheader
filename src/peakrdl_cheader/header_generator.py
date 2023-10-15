@@ -21,7 +21,7 @@ class HeaderGenerator(RDLListener):
         self.root_node = None
 
         self.f: TextIO
-        self.f = None
+        self.f = None # type: ignore
 
     def run(self, path: str, top_nodes: List[AddrmapNode]) -> None:
         with open(path, "w", encoding='utf-8') as f:

@@ -45,10 +45,10 @@ class OffsetTestsGenerator(RDLListener):
         self.root_node = None
 
         self.root_struct_name: str
-        self.root_struct_name = None
+        self.root_struct_name = ""
 
         self.f: TextIO
-        self.f = None
+        self.f = None # type: ignore
 
         self.overlap_pair_stack: List[List[str]]
         self.overlap_pair_stack = []
@@ -150,7 +150,7 @@ class BitfieldTestsGenerator(RDLListener):
         self.root_node = None
 
         self.f: TextIO
-        self.f = None
+        self.f = None # type: ignore
 
     def run(self, f: TextIO, top_nodes: List[AddrmapNode]) -> None:
         self.f = f

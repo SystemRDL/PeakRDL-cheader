@@ -79,22 +79,20 @@ class BaseHeaderTestcase(TestCase):
     def do_compile(self):
         args = [
             "gcc",
-            "--std", self.std.name,
+            "--std", self.std.value,
             os.path.join(self.output_dir, "out.h.test.c"),
             "-o", os.path.join(self.output_dir, "test.exe"),
         ]
-        ret = subprocess.run(args, capture_output=True)
+        ret = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         print(" ".join(args))
         print(ret.stdout.decode('utf-8'))
-        print(ret.stderr.decode('utf-8'))
         self.assertEqual(ret.returncode, 0)
 
     def do_run(self):
         args = [os.path.join(self.output_dir, "test.exe")]
-        ret = subprocess.run(args, capture_output=True)
+        ret = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         print(" ".join(args))
         print(ret.stdout.decode('utf-8'))
-        print(ret.stderr.decode('utf-8'))
         self.assertEqual(ret.returncode, 0)
 
     def do_test(self):
