@@ -1,5 +1,5 @@
-[![Documentation Status](https://readthedocs.org/projects/peakrdl-cheader/badge/?version=latest)](https://peakrdl-python.readthedocs.io)
-[![build](https://github.com/SystemRDL/PeakRDL-cheader/actions/workflows/build/badge.svg)](https://github.com/SystemRDL/PeakRDL-cheader/actions/workflows/build.yaml?query=branch%3Amain)
+[![Documentation Status](https://readthedocs.org/projects/peakrdl-cheader/badge/?version=latest)](https://peakrdl-cheader.readthedocs.io)
+[![build](https://github.com/SystemRDL/PeakRDL-cheader/workflows/build/badge.svg)](https://github.com/SystemRDL/PeakRDL-cheader/actions?query=workflow%3Abuild+branch%3Amain)
 [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/peakrdl-cheader.svg)](https://pypi.org/project/peakrdl-cheader)
 
 # PeakRDL C Header
