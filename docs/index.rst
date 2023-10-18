@@ -53,6 +53,16 @@ Using the generated header, you can access your device registers by name!
     }
 
 
+Links
+-----
+
+- `Source repository <https://github.com/SystemRDL/PeakRDL-cheader>`_
+- `Release Notes <https://github.com/SystemRDL/PeakRDL-cheader/releases>`_
+- `Issue tracker <https://github.com/SystemRDL/PeakRDL-cheader/issues>`_
+- `PyPi <https://pypi.org/project/peakrdl-cheader>`_
+- `SystemRDL Specification <http://accellera.org/downloads/standards/systemrdl>`_
+
+
 .. toctree::
     :hidden:
 
