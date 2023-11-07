@@ -19,7 +19,7 @@ description = "Generate C Header files from a SystemRDL register model"
 readme = "README.md"
 license = {file = "LICENSE"}
 keywords = [
-    "SystmRDL", "PeakRDL", "CSR", "compiler", "tool", "registers", "generator",
+    "SystemRDL", "PeakRDL", "CSR", "compiler", "tool", "registers", "generator",
     "C", "header", "software",
 ]
 classifiers = [
