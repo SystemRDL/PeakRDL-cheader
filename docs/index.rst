@@ -28,11 +28,14 @@ Install from `PyPi`_ using pip
 
 Quick Start
 -----------
-The easiest way is to use the `PeakRDL command line tool <https://peakrdl.readthedocs.io/>`_:
+The easiest way to use PeakRDL-ipxact is via the `PeakRDL command line tool <https://peakrdl.readthedocs.io/>`_:
 
 .. code-block:: bash
 
+    # Install the command line tool
     python3 -m pip install peakrdl
+
+    # Generate a C header
     peakrdl c-header example.rdl -o example.h
 
 Using the generated header, you can access your device registers by name!
