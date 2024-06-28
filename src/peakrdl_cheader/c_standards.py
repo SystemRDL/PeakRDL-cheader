@@ -7,6 +7,9 @@ class CStandard(enum.Enum):
         self.anon_unions = d.get("anon_unions", False)
         self.static_assert = d.get("static_assert", False)
         self.static_assert_needs_assert_h = d.get("static_assert_needs_assert_h", False)
+        self.static_assert_needs_build_bug_h = d.get("static_assert_needs_build_bug_h", False)
+        self.needs_stdint_h = d.get("needs_stdint_h", True)
+        self.needs_types_h = d.get("needs_types_h", False)
 
         # Prevent Enum from flattening members into aliases
         self._value_ = name
@@ -44,6 +47,15 @@ class CStandard(enum.Enum):
         "anon_unions": False,
         "static_assert": False,
         "static_assert_needs_assert_h": False,
+    }
+
+    linux = "linux", {
+        "anon_unions" : True,
+        "static_assert" :True,
+        "needs_stdint_h": False,
+        "needs_types_h" :True,
+        "static_assert_needs_assert_h" : False,
+        "static_assert_needs_build_bug_h": True,
     }
 
     latest = gnu17 # gnu23 is still unreleased

@@ -8,7 +8,15 @@
 extern "C" {
 #endif
 
+{%- if ds.std.needs_stdint_h %}
 #include <stdint.h>
+{%- endif %}
+{%- if ds.std.needs_types_h %}
+#include <linux/types.h>
+{%- endif %}
 {%- if ds.std.static_assert_needs_assert_h %}
 #include <assert.h>
+{%- endif %}
+{%- if ds.std.static_assert_needs_build_bug_h %}
+#include <linux/build_bug.h>
 {%- endif %}
