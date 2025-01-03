@@ -1,9 +1,9 @@
-from typing import List, TextIO, Set, Match
+from typing import List, TextIO, Set, Match, Union
 import os
 import re
 
 from systemrdl.walker import RDLListener, RDLWalker
-from systemrdl.node import AddrmapNode, RegNode, AddressableNode
+from systemrdl.node import AddrmapNode, RegNode, AddressableNode, MemNode, RegfileNode
 
 from .design_state import DesignState
 from . import utils
@@ -13,7 +13,7 @@ class TestcaseGenerator:
     def __init__(self, ds: DesignState) -> None:
         self.ds = ds
 
-    def run(self, header_path: str, top_nodes: List[AddrmapNode]) -> None:
+    def run(self, header_path: str, top_nodes: List[Union[AddrmapNode, MemNode, RegfileNode]]) -> None:
         testcase_path = header_path + ".test.c"
         with open(testcase_path, "w", encoding='utf-8') as f:
 
@@ -24,7 +24,7 @@ class TestcaseGenerator:
 
             # Stream header via jinja
             template = self.ds.jj_env.get_template("test_header.c")
-            template.stream(context).dump(f)
+            template.stream(context).dump(f) # type: ignore # jinja incorrectly typed
             f.write("\n\n")
 
             OffsetTestsGenerator(self.ds).run(f, top_nodes)
@@ -36,24 +36,21 @@ class TestcaseGenerator:
 
 
 class OffsetTestsGenerator(RDLListener):
+    root_node: Union[AddrmapNode, MemNode, RegfileNode]
+    f: TextIO
+
     def __init__(self, ds: DesignState) -> None:
         self.ds = ds
 
         self.indent_level = 0
 
-        self.root_node: AddrmapNode
-        self.root_node = None
-
         self.root_struct_name: str
         self.root_struct_name = ""
-
-        self.f: TextIO
-        self.f = None # type: ignore
 
         self.overlap_pair_stack: List[List[str]]
         self.overlap_pair_stack = []
 
-    def run(self, f: TextIO, top_nodes: List[AddrmapNode]) -> None:
+    def run(self, f: TextIO, top_nodes: List[Union[AddrmapNode, MemNode, RegfileNode]]) -> None:
         self.f = f
 
         f.write("static void test_offsets(void){\n")
@@ -138,6 +135,9 @@ class OffsetTestsGenerator(RDLListener):
 
 
 class BitfieldTestsGenerator(RDLListener):
+    root_node: Union[AddrmapNode, MemNode, RegfileNode]
+    f: TextIO
+
     def __init__(self, ds: DesignState) -> None:
         self.ds = ds
 
@@ -146,13 +146,8 @@ class BitfieldTestsGenerator(RDLListener):
         self.defined_namespace: Set[str]
         self.defined_namespace = set()
 
-        self.root_node: AddrmapNode
-        self.root_node = None
 
-        self.f: TextIO
-        self.f = None # type: ignore
-
-    def run(self, f: TextIO, top_nodes: List[AddrmapNode]) -> None:
+    def run(self, f: TextIO, top_nodes: List[Union[AddrmapNode, MemNode, RegfileNode]]) -> None:
         self.f = f
 
         f.write("static void test_bitfields(void){\n")

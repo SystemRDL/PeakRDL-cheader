@@ -1,15 +1,18 @@
-from typing import TextIO, Set, Optional, List
+from typing import TextIO, Set, Optional, List, Union
 import os
 import re
 
 from systemrdl.walker import RDLListener, RDLWalker, WalkerAction
-from systemrdl.node import AddrmapNode, AddressableNode, RegNode, FieldNode, Node, MemNode
+from systemrdl.node import AddrmapNode, AddressableNode, RegNode, FieldNode, Node, MemNode, RegfileNode
 
 from .design_state import DesignState
 from .identifier_filter import kw_filter as kwf
 from . import utils
 
 class HeaderGenerator(RDLListener):
+    root_node: Union[AddrmapNode, MemNode, RegfileNode]
+    f: TextIO
+
     def __init__(self, ds: DesignState) -> None:
         self.ds = ds
 
@@ -17,13 +20,7 @@ class HeaderGenerator(RDLListener):
         self.defined_namespace = set()
         self.indent_level = 0
 
-        self.root_node: AddrmapNode
-        self.root_node = None
-
-        self.f: TextIO
-        self.f = None # type: ignore
-
-    def run(self, path: str, top_nodes: List[AddrmapNode]) -> None:
+    def run(self, path: str, top_nodes: List[Union[AddrmapNode, MemNode, RegfileNode]]) -> None:
         with open(path, "w", encoding='utf-8') as f:
             self.f = f
 
@@ -36,7 +33,7 @@ class HeaderGenerator(RDLListener):
 
             # Stream header via jinja
             template = self.ds.jj_env.get_template("header.h")
-            template.stream(context).dump(f)
+            template.stream(context).dump(f) # type: ignore # jinja incorrectly typed
             f.write("\n")
 
             # Generate definitions
@@ -50,7 +47,7 @@ class HeaderGenerator(RDLListener):
                 for node in top_nodes:
                     addr = node.raw_absolute_address + self.ds.inst_offset
                     type_name = utils.get_struct_name(self.ds, node, node)
-                    if node.is_array:
+                    if node.array_dimensions:
                         if len(node.array_dimensions) > 1:
                             node.env.msg.fatal(
                                 f"C header generator does not support instance defines for multi-dimensional arrays: {node.inst_name}{node.array_dimensions}",
@@ -62,7 +59,7 @@ class HeaderGenerator(RDLListener):
 
             # Stream footer via jinja
             template = self.ds.jj_env.get_template("footer.h")
-            template.stream(context).dump(f)
+            template.stream(context).dump(f) # type: ignore # jinja incorrectly typed
 
             # Ensure newline before EOF
             f.write("\n")
@@ -281,11 +278,14 @@ class HeaderGenerator(RDLListener):
                 # Check if register is overlapping first
                 partner_reg_name = self.ds.overlapping_reg_pairs.get(child.get_path(), None)
                 if partner_reg_name:
+                    partner_reg = node.get_child_by_name(partner_reg_name)
+                    assert isinstance(partner_reg, RegNode)
+
                     # Two registers occupy the same space
                     self.write("union {\n")
                     self.push_indent()
                     self.write_reg_struct_member(child)
-                    self.write_reg_struct_member(node.get_child_by_name(partner_reg_name))
+                    self.write_reg_struct_member(partner_reg)
                     self.pop_indent()
                     if self.ds.std.anon_unions:
                         self.write("};\n")
@@ -301,6 +301,7 @@ class HeaderGenerator(RDLListener):
 
         # Write end padding as needed
         if node.is_array:
+            assert node.array_stride is not None
             padding = node.array_stride - current_offset
         else:
             padding = node.size - current_offset
@@ -316,7 +317,7 @@ class HeaderGenerator(RDLListener):
 
 
     def write_reg_struct_member(self, node: RegNode) -> None:
-        if node.is_array:
+        if node.array_dimensions:
             array_suffix = "".join(f"[{dim}]" for dim in node.array_dimensions)
         else:
             array_suffix = ""
@@ -336,7 +337,7 @@ class HeaderGenerator(RDLListener):
 
 
     def write_group_struct_member(self, node: AddressableNode) -> None:
-        if node.is_array:
+        if node.array_dimensions:
             array_suffix = "".join(f"[{dim}]" for dim in node.array_dimensions)
         else:
             array_suffix = ""

@@ -17,9 +17,6 @@ pip install -r requirements.txt
 pip install -U ../
 
 # Run unit tests
-export SKIP_SYNTH_TESTS=1
-#export STUB_SIMULATOR=1
-export NO_XSIM=1
 pytest -n auto --cov=peakrdl_cheader
 
 # Generate coverage report

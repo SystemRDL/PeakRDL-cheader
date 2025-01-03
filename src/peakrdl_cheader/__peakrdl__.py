@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
 from peakrdl.plugins.exporter import ExporterSubcommandPlugin #pylint: disable=import-error
 from peakrdl.config import schema #pylint: disable=import-error
@@ -76,8 +76,8 @@ class Exporter(ExporterSubcommandPlugin):
         )
 
         # Wrap constructor to allow hex strings
-        def integer(n):
-            return int(n, 0)
+        def integer(n: Union[int, str]) -> int:
+            return int(n, 0) # type: ignore # bogus error
 
         arg_group.add_argument(
             "--inst-offset",
