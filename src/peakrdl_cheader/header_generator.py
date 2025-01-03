@@ -317,7 +317,7 @@ class HeaderGenerator(RDLListener):
 
     def write_reg_struct_member(self, node: RegNode) -> None:
         if node.is_array:
-            array_suffix = str(node.array_dimensions)
+            array_suffix = "".join(f"[{dim}]" for dim in node.array_dimensions)
         else:
             array_suffix = ""
 
@@ -337,7 +337,7 @@ class HeaderGenerator(RDLListener):
 
     def write_group_struct_member(self, node: AddressableNode) -> None:
         if node.is_array:
-            array_suffix = str(node.array_dimensions)
+            array_suffix = "".join(f"[{dim}]" for dim in node.array_dimensions)
         else:
             array_suffix = ""
 
