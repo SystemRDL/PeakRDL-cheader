@@ -18,6 +18,8 @@ class CHeaderExporter:
             Output header file path
         std: CStandard
             Select which GNU C standard to conform to
+        linux_kernel: bool
+            If True, output uses Linux kernel-compatible header includes.
         reuse_typedefs: bool
             By default, the exporter will attempt to re-use typedefs for
             nodes that are equivalent. This allows for better modularity and type reuse.

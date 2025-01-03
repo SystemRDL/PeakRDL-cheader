@@ -8,7 +8,13 @@
 extern "C" {
 #endif
 
+{%- if ds.linux_kernel %}
+#include <linux/types.h>
+{%- else %}
 #include <stdint.h>
-{%- if ds.std.static_assert_needs_assert_h %}
+{%- endif %}
+{%- if ds.linux_kernel %}
+#include <linux/build_bug.h>
+{%- elif ds.std.static_assert_needs_assert_h %}
 #include <assert.h>
 {%- endif %}

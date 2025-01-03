@@ -34,6 +34,9 @@ class DesignState:
         self.std = kwargs.pop("std", CStandard.latest)
         assert isinstance(self.std, CStandard)
 
+        self.linux_kernel: bool
+        self.linux_kernel = kwargs.pop("linux_kernel", False)
+
         self.reuse_typedefs: bool
         self.reuse_typedefs = kwargs.pop("reuse_typedefs", True)
 

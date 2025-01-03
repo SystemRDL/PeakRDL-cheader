@@ -31,6 +31,15 @@ class Exporter(ExporterSubcommandPlugin):
         )
 
         arg_group.add_argument(
+            "--linux-kernel",
+            action="store_true",
+            default=False,
+            help=""""
+            If set, output uses Linux kernel-compatible header includes.
+            """
+        )
+
+        arg_group.add_argument(
             "-b", "--bitfields",
             choices=["ltoh", "htol", "none"],
             default=None,
@@ -48,10 +57,10 @@ class Exporter(ExporterSubcommandPlugin):
             action="store_true",
             default=False,
             help=""""
-            If set, the top-level hiearchy is skipped. Instead, definitions for
+            If set, the top-level hierarchy is skipped. Instead, definitions for
             all the direct children are generated.
 
-            Note that only block-like definitons are generated.
+            Note that only block-like definitions are generated.
             i.e: children that are registers are skipped.
             """
         )
