@@ -21,11 +21,11 @@ class DesignState:
         #------------------------
         # Each reg that has overlapping fields generates an entry:
         #   reg_path : list of field names involved in overlap
-        self.overlapping_fields = {} # type: Dict[str, List[str]]
+        self.overlapping_fields: Dict[str, List[str]] = {}
 
         # Pairs of overlapping registers
         #   first_reg_path : partner_register_name
-        self.overlapping_reg_pairs = {} # type: Dict[str, str]
+        self.overlapping_reg_pairs: Dict[str, str] = {}
 
         #------------------------
         # Extract compiler args
