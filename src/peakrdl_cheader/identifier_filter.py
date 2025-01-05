@@ -8,11 +8,16 @@ C_KEYWORDS = {
     "while",
 
     # C99
-    "inline", "restrict",
+    "inline", "restrict", "_Bool", "_Complex", "_Imaginary",
+
+    # C11
+    "_Alignas", "_Alignof", "_Atomic", "_Generic", "_Noreturn",
+    "_Static_assert", "_Thread_local",
 
     # C23
     "alignas", "alignof", "bool", "constexpr", "false", "nullptr",
     "static_assert", "thread_local", "true", "typeof", "typeof_unqual",
+    "_BitInt", "_Decimal128", "_Decimal32", "_Decimal64",
 }
 
 def kw_filter(s: str) -> str:
