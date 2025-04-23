@@ -1,2 +1,2 @@
 pygments-systemrdl
-sphinx-rtd-theme
+sphinx-book-theme
