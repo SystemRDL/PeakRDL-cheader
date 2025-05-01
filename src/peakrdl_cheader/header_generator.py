@@ -1,4 +1,4 @@
-from typing import TextIO, Set, Optional, List, Union
+from typing import Type, TextIO, Set, Optional, List, Union
 import os
 import re
 
@@ -35,6 +35,10 @@ class HeaderGenerator(RDLListener):
             template = self.ds.jj_env.get_template("header.h")
             template.stream(context).dump(f) # type: ignore # jinja incorrectly typed
             f.write("\n")
+
+            # Write enums
+            if self.ds.generate_enums:
+                self.write_enums(top_nodes)
 
             # Generate definitions
             for node in top_nodes:
@@ -99,6 +103,11 @@ class HeaderGenerator(RDLListener):
         self.write("struct __attribute__ ((__packed__)) {\n")
         self.push_indent()
 
+        def get_field_type(field: FieldNode) -> str:
+            encode = field.get_property("encode")
+            return f"uint{regwidth}_t" if not self.ds.generate_enums or encode is None else \
+                f"{self.get_enum_prefix(encode)}_e"
+
         if self.ds.bitfield_order_ltoh:
             # Bits are packed in struct LSb --> MSb
             current_offset = 0
@@ -106,7 +115,7 @@ class HeaderGenerator(RDLListener):
                 if field.low > current_offset:
                     self.write(f"uint{regwidth}_t :{field.low - current_offset:d};\n")
                     current_offset = field.low
-                self.write(f"uint{regwidth}_t {kwf(field.inst_name)} :{field.width:d};\n")
+                self.write(f"{get_field_type(field)} {kwf(field.inst_name)} :{field.width:d};\n")
                 current_offset += field.width
 
             if current_offset < regwidth:
@@ -118,7 +127,7 @@ class HeaderGenerator(RDLListener):
                 if field.high < current_offset:
                     self.write(f"uint{regwidth}_t :{current_offset - field.high:d};\n")
                     current_offset = field.high
-                self.write(f"uint{regwidth}_t {kwf(field.inst_name)} :{field.width:d};\n")
+                self.write(f"{get_field_type(field)} {kwf(field.inst_name)} :{field.width:d};\n")
                 current_offset -= field.width
 
             if current_offset > -1:
@@ -344,3 +353,39 @@ class HeaderGenerator(RDLListener):
 
         struct_name = self.get_struct_name(node)
         self.write(f"{struct_name} {kwf(node.inst_name)}{array_suffix};\n")
+
+    @staticmethod
+    def get_enum_prefix(user_enum: Type['UserEnum']) -> str:
+        scope = user_enum.get_scope_path("__")
+        if scope:
+            return f"{scope}__{user_enum.type_name}"
+        else:
+            return user_enum.type_name
+
+    def write_enum(self, user_enum: Type['UserEnum']) -> None:
+        prefix = self.get_enum_prefix(user_enum)
+        lines = []
+        for enum_member in user_enum:
+            lines.append(f"    {prefix}__{enum_member.name} = {enum_member.value}")
+
+        self.write("typedef enum {\n"
+                   + ",\n".join(lines)
+                   + f"\n}} {prefix}_e;\n")
+
+    def write_enums(self, top_nodes: List[AddrmapNode]) -> None:
+        user_enums = []
+
+        class Listener(RDLListener):
+            def enter_Field(listener, node: FieldNode) -> Optional[WalkerAction]:
+                encode = node.get_property("encode")
+                if encode is not None and encode not in user_enums:
+                    user_enums.append(encode)
+                return None
+
+        for node in top_nodes:
+            self.root_node = node
+            RDLWalker().walk(node, Listener())
+
+        for user_enum in user_enums:
+            self.write("\n")
+            self.write_enum(user_enum)
