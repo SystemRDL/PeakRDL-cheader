@@ -50,7 +50,6 @@ class IntWidth(_FixedpointWidth):
         """
         assert isinstance(node, FieldNode)
         fracwidth = node.get_property("fracwidth", default=None)
-        print(f"Getting unasigned default for intwidth. {fracwidth=}")
         if fracwidth is not None:
             return node.width - fracwidth
         else:
@@ -67,7 +66,6 @@ class FracWidth(_FixedpointWidth):
         """
         assert isinstance(node, FieldNode)
         intwidth = node.get_property("intwidth", default=None)
-        print(f"Getting unasigned default for fracwidth. {intwidth=}")
         if intwidth is not None:
             return node.width - intwidth
         else:
