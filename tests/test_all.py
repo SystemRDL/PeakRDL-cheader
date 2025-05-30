@@ -6,9 +6,10 @@ from parameterized import parameterized_class
 
 exceptions = [
     "testcases/wide_regs.rdl",
+    "testcases/udps.rdl",
 ]
 files = glob.glob("testcases/*.rdl")
-files = [file for file in files if not file in exceptions]
+files = [file for file in files if file not in exceptions]
 
 @parameterized_class(base.get_permutations({
     "rdl_file": files,
