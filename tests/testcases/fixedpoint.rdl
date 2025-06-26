@@ -1,0 +1,25 @@
+addrmap test_fixedpoint {
+
+    reg {
+        default sw = rw;
+        default hw = r;
+        default is_signed;
+        default intwidth = 10;
+        field {} SQ10_22[31:0];
+    } reg_a;
+
+    reg {
+        default sw = r;
+        default hw = w;
+        default is_signed = false;
+        default fracwidth = 10;
+        field {} Q22_10[31:0];
+    } reg_b;
+
+    reg {
+        default sw = r;
+        default hw = w;
+        default fracwidth = 40;
+        field {} Qn8_40[31:0];
+    } reg_c;
+};
