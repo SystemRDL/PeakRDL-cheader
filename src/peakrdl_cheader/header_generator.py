@@ -139,13 +139,14 @@ class HeaderGenerator(RDLListener):
         for field in node.fields():
             field_prefix = prefix + "__" + field.inst_name.upper()
 
-            bm = ((1 << field.width) - 1) << field.low
-            self.write(f"#define {field_prefix}_bm {bm:#x}\n")
-            self.write(f"#define {field_prefix}_bp {field.low:d}\n")
-            self.write(f"#define {field_prefix}_bw {field.width:d}\n")
+            if not self.ds.non_zero_reset_only:
+                bm = ((1 << field.width) - 1) << field.low
+                self.write(f"#define {field_prefix}_bm {bm:#x}\n")
+                self.write(f"#define {field_prefix}_bp {field.low:d}\n")
+                self.write(f"#define {field_prefix}_bw {field.width:d}\n")
 
             reset = field.get_property('reset')
-            if isinstance(reset, int):
+            if isinstance(reset, int) and (not self.ds.non_zero_reset_only or reset):
                 self.write(f"#define {field_prefix}_reset {reset:#x}\n")
 
         # No need to traverse fields
