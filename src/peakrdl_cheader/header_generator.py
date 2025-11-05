@@ -51,7 +51,7 @@ class HeaderGenerator(RDLListener):
                         if len(node.array_dimensions) > 1:
                             node.env.msg.fatal(
                                 f"C header generator does not support instance defines for multi-dimensional arrays: {node.inst_name}{node.array_dimensions}",
-                                node.inst.inst_src_ref
+                                node.inst_src_ref
                             )
                         f.write(f"#define {node.inst_name} ((volatile {type_name} *){addr:#x}UL)\n")
                     else:
@@ -93,7 +93,7 @@ class HeaderGenerator(RDLListener):
             # TODO: add support for this
             self.root_node.env.msg.fatal(
                 "C header bit-fields for registers wider than 64-bits is not supported yet",
-                fields[0].parent.inst.inst_src_ref
+                fields[0].parent.inst_src_ref
             )
 
         self.write("struct __attribute__ ((__packed__)) {\n")

@@ -76,7 +76,7 @@ class DesignScanner(RDLListener):
                 self.msg.error(
                     "C header export currently only supports registers that are co-located. "
                     f"See registers: '{prev_reg.inst_name}' and '{node.inst_name}.'",
-                    node.inst.inst_src_ref
+                    node.inst_src_ref
                 )
 
             # Save information about register overlap pair
@@ -87,7 +87,7 @@ class DesignScanner(RDLListener):
             self.msg.error(
                 "C header export does not support sparse arrays of registers. "
                 f"See register: '{node.inst_name}.'",
-                node.inst.inst_src_ref
+                node.inst_src_ref
             )
 
         return WalkerAction.SkipDescendants

@@ -7,7 +7,7 @@ name = "peakrdl-cheader"
 dynamic = ["version"]
 requires-python = ">=3.7"
 dependencies = [
-    "systemrdl-compiler ~= 1.29",
+    "systemrdl-compiler ~= 1.30",
     "jinja2",
 ]
 
