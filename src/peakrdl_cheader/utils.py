@@ -50,7 +50,7 @@ def get_friendly_name(ds: DesignState, root_node: Union[AddrmapNode, MemNode, Re
     else:
         friendly_name = node.get_rel_path(root_node.parent)
 
-    return type(node.inst).__name__ + " - " + friendly_name
+    return node.component_type_name + " - " + friendly_name
 
 def roundup_pow2(x: int) -> int:
     return 1<<(x-1).bit_length()
