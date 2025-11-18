@@ -53,6 +53,15 @@ class Exporter(ExporterSubcommandPlugin):
         )
 
         arg_group.add_argument(
+            "-e", "--generate-enums",
+            action="store_true",
+            default=False,
+            help="""
+            Enable generation of enum definitions.
+            """
+        )
+
+        arg_group.add_argument(
             "-x", "--explode-top",
             action="store_true",
             default=False,
