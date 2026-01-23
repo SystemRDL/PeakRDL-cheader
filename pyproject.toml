@@ -49,3 +49,6 @@ version = {attr = "peakrdl_cheader.__about__.__version__"}
 
 [project.entry-points."peakrdl.exporters"]
 c-header = "peakrdl_cheader.__peakrdl__:Exporter"
+
+[tool.setuptools.package-data]
+peakrdl_cheader = ["templates/*.h"]

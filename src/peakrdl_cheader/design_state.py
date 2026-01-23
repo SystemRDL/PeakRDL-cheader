@@ -65,3 +65,6 @@ class DesignState:
 
         self.testcase: bool
         self.testcase = kwargs.pop("testcase", False)
+
+        self.custom: bool
+        self.use_custom = kwargs.pop('use_custom', False)

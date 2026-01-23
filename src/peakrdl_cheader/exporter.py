@@ -8,6 +8,9 @@ from .header_generator import HeaderGenerator
 from .testcase_generator import TestcaseGenerator
 
 class CHeaderExporter:
+    def __init__(self, *, use_custom: bool = False) -> None:
+        self.use_custom = use_custom
+
     def export(self, node: Union[RootNode, AddrmapNode], path: str, **kwargs: Any) -> None:
         """
         Parameters
@@ -53,6 +56,8 @@ class CHeaderExporter:
             Apply an additional address offset to instance definitions.
         testcase: bool
             Generate a testcase C file
+        custom: bool
+            Use custom_header.h and custom_footer.h templates for header generation
         """
         # If it is the root node, skip to top addrmap
         if isinstance(node, RootNode):
@@ -60,6 +65,7 @@ class CHeaderExporter:
         else:
             top_node = node
 
+        kwargs['use_custom'] = self.use_custom
         ds = DesignState(top_node, kwargs)
 
         # Check for stray kwargs

@@ -21,6 +21,9 @@ class HeaderGenerator(RDLListener):
         self.indent_level = 0
 
     def run(self, path: str, top_nodes: List[Union[AddrmapNode, MemNode, RegfileNode]]) -> None:
+        h_file = "custom_header.h" if self.ds.use_custom else "header.h"
+        f_file = "custom_footer.h" if self.ds.use_custom else "footer.h"
+
         with open(path, "w", encoding='utf-8') as f:
             self.f = f
 
@@ -31,8 +34,8 @@ class HeaderGenerator(RDLListener):
                 "get_struct_name": utils.get_struct_name,
             }
 
+            template = self.ds.jj_env.get_template(h_file)
             # Stream header via jinja
-            template = self.ds.jj_env.get_template("header.h")
             template.stream(context).dump(f) # type: ignore # jinja incorrectly typed
             f.write("\n")
 
@@ -58,7 +61,7 @@ class HeaderGenerator(RDLListener):
                         f.write(f"#define {node.inst_name} (*(volatile {type_name} *){addr:#x}UL)\n")
 
             # Stream footer via jinja
-            template = self.ds.jj_env.get_template("footer.h")
+            template = self.ds.jj_env.get_template(f_file)
             template.stream(context).dump(f) # type: ignore # jinja incorrectly typed
 
             # Ensure newline before EOF
@@ -137,16 +140,29 @@ class HeaderGenerator(RDLListener):
         self.write(f"\n// {self.get_friendly_name(node)}\n")
 
         for field in node.fields():
-            field_prefix = prefix + "__" + field.inst_name.upper()
+            desc = field.get_property('desc') or field.inst_name
+            if self.ds.use_custom:
+                field_prefix = prefix + "_F_" + field.inst_name.upper()
+            else:
+                field_prefix = prefix + "__" + field.inst_name.upper()
 
             bm = ((1 << field.width) - 1) << field.low
-            self.write(f"#define {field_prefix}_bm {bm:#x}\n")
-            self.write(f"#define {field_prefix}_bp {field.low:d}\n")
-            self.write(f"#define {field_prefix}_bw {field.width:d}\n")
+            if self.ds.use_custom:
+                self.write(f"#define {field_prefix}_BM {bm:#x} // {desc} field bitmask\n")
+                # Marking a position of the low-bit of the field
+                self.write(f"#define {field_prefix}_BP {field.low:d} // {desc} field bit position\n")
+                self.write(f"#define {field_prefix}_BW {field.width:d} // {desc} field width\n")
+            else:
+                self.write(f"#define {field_prefix}_bm {bm:#x}\n")
+                self.write(f"#define {field_prefix}_bp {field.low:d}\n")
+                self.write(f"#define {field_prefix}_bw {field.width:d}\n")
 
             reset = field.get_property('reset')
             if isinstance(reset, int):
-                self.write(f"#define {field_prefix}_reset {reset:#x}\n")
+                if self.ds.use_custom:
+                    self.write(f"#define {field_prefix}_RESET {reset:#x} // {desc} field reset value\n")
+                else:
+                    self.write(f"#define {field_prefix}_reset {reset:#x}\n")
 
         # No need to traverse fields
         return WalkerAction.SkipDescendants
@@ -189,14 +205,20 @@ class HeaderGenerator(RDLListener):
         self.write_bitfields("fr", regwidth, fr_fields)
         self.write_bitfields("fw", regwidth, fw_fields)
 
-        # Write word member
+        # Write word or all member
         if regwidth > 64:
             # Cannot use stdint types
             # Build the wide register as an array of smaller stdint types
             n_subwords = regwidth // self.ds.wide_reg_subword_size
-            self.write(f"uint{self.ds.wide_reg_subword_size}_t w[{n_subwords}];\n")
+            if self.ds.use_custom:
+                self.write(f"uint{self.ds.wide_reg_subword_size}_t all[{n_subwords}];\n")
+            else:
+                self.write(f"uint{self.ds.wide_reg_subword_size}_t w[{n_subwords}];\n")
         else:
-            self.write(f"uint{regwidth}_t w;\n")
+            if self.ds.use_custom:
+                self.write(f"uint{regwidth}_t all;\n")
+            else:
+                self.write(f"uint{regwidth}_t w;\n")
 
         self.pop_indent()
         self.write(f"}} {union_name};\n")

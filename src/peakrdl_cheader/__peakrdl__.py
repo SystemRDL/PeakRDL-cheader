@@ -122,6 +122,14 @@ class Exporter(ExporterSubcommandPlugin):
             """
         )
 
+        arg_group.add_argument(
+            "--custom",
+            action="store_true",
+            help="""
+            Use custom_header.h and custom_footer.h templates for header generation
+            """
+        )
+
     def do_export(self, top_node: 'AddrmapNode', options: 'argparse.Namespace') -> None:
         std_name = options.std or self.cfg['std'] or "latest"
         std = CStandard[std_name]
@@ -135,7 +143,7 @@ class Exporter(ExporterSubcommandPlugin):
 
         subword_size = options.subword_size or self.cfg['subword_size'] or 32
 
-        x = CHeaderExporter()
+        x = CHeaderExporter(use_custom=options.custom)
         x.export(
             top_node,
             path=options.output,
