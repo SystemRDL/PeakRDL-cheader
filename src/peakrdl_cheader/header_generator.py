@@ -4,6 +4,8 @@ import re
 
 from systemrdl.walker import RDLListener, RDLWalker, WalkerAction
 from systemrdl.node import AddrmapNode, AddressableNode, RegNode, FieldNode, Node, MemNode, RegfileNode
+from systemrdl.component import Regfile
+from systemrdl.rdltypes.user_enum import UserEnum
 
 from .design_state import DesignState
 from .identifier_filter import kw_filter as kwf
@@ -19,6 +21,7 @@ class HeaderGenerator(RDLListener):
         self.defined_namespace: Set[str]
         self.defined_namespace = set()
         self.indent_level = 0
+        self.seen_enums: Set[type[UserEnum]] = set()
 
     def run(self, path: str, top_nodes: List[Union[AddrmapNode, MemNode, RegfileNode]]) -> None:
         with open(path, "w", encoding='utf-8') as f:
@@ -127,6 +130,47 @@ class HeaderGenerator(RDLListener):
         self.pop_indent()
         self.write(f"}} {grp_name};\n")
 
+
+    def write_enums(self, node: RegNode) -> None:
+        # Write out enums used in 'encode' properies.
+        written = False
+        for field in node.fields():
+            enc = field.get_property("encode")
+            if not enc:
+                continue
+            if enc in self.seen_enums:
+                continue
+
+            # Construct a parent scope prefix for the enum.
+            parent = enc.get_parent_scope()
+            if not parent:
+                pprefix: Optional[str] = ""
+            elif isinstance(parent, Regfile):
+                pprefix = enc.get_scope_path("_")
+            else:
+                pprefix = parent.get_scope_path("_")
+
+            # Uppercase and append an underscore. If the parent scope
+            # is the root, leave it empty.
+            if pprefix:
+                pprefix = f"{pprefix.upper()}_"
+            else:
+                pprefix = ""
+
+            # Drop the optional "_encoding" at the end, and append the
+            # enum type name as the prefix.
+            eprefix = enc.type_name.removesuffix("_encoding").upper()
+
+            if not written:
+                self.write("\n// enums\n")
+                written = True
+            for mem in enc.members.values():
+                self.write(f"#define {pprefix}{eprefix}_{mem.name} {mem.value:#x}\n")
+
+            # Only emit an enum once.
+            self.seen_enums.add(enc)
+
+
     def enter_Reg(self, node: RegNode) -> Optional[WalkerAction]:
         prefix = self.get_node_prefix(node).upper()
 
@@ -147,6 +191,8 @@ class HeaderGenerator(RDLListener):
             reset = field.get_property('reset')
             if isinstance(reset, int):
                 self.write(f"#define {field_prefix}_reset {reset:#x}\n")
+
+        self.write_enums(node)
 
         # No need to traverse fields
         return WalkerAction.SkipDescendants

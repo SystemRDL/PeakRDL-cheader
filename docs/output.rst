@@ -88,3 +88,11 @@ C's ``<stdint.h>`` types only extend up to 64-bit types.
 
 If a register is encountered that is larger than this, the generated
 header will represent it using an array of smaller sub-words.
+
+
+Enumerations used in encodings
+------------------------------
+
+``enum`` components used in field encodings are emitted as ``#define``
+macros at their first occurrence. They are prefixed with the parent
+scope and the enum's type name to avoid collisions.
