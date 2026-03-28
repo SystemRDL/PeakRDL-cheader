@@ -6,6 +6,7 @@ from itertools import product
 from systemrdl import RDLCompiler
 from peakrdl_cheader.exporter import CHeaderExporter
 from peakrdl_cheader.c_standards import CStandard
+from peakrdl_cheader.udps import ALL_UDPS
 
 
 def get_permutations(spec):
@@ -56,6 +57,9 @@ class BaseHeaderTestcase(TestCase):
         rdl_path = os.path.join(os.path.dirname(__file__), self.rdl_file)
 
         rdlc = RDLCompiler()
+        for udp in ALL_UDPS:
+            rdlc.register_udp(udp)
+        rdlc.compile_file('testcases/udps.rdl')
         rdlc.compile_file(rdl_path)
         top_node = rdlc.elaborate()
 

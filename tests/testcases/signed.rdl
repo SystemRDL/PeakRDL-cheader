@@ -1,0 +1,17 @@
+addrmap test_signed {
+
+    reg {
+        default sw = rw;
+        default hw = r;
+        default is_signed;
+        field {} signed_field[31:0];
+    } reg_a;
+
+    reg {
+        default sw = r;
+        default hw = w;
+        default is_signed = false;
+        field {} unsigned_field[31:0];
+    } reg_b;
+
+};

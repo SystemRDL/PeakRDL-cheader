@@ -144,6 +144,17 @@ class HeaderGenerator(RDLListener):
             self.write(f"#define {field_prefix}_bp {field.low:d}\n")
             self.write(f"#define {field_prefix}_bw {field.width:d}\n")
 
+            intwidth = field.get_property('intwidth')
+            if intwidth is not None:
+                fracwidth = field.get_property('fracwidth')
+                assert fracwidth is not None, "Fixedpoint UDP class must be registered with exporter"
+                self.write(f"#define {field_prefix}_iw {intwidth:d}\n")
+                self.write(f"#define {field_prefix}_fw {fracwidth:d}\n")
+
+            is_signed = field.get_property('is_signed')
+            if is_signed is not None:
+                self.write(f"#define {field_prefix}_signed {int(is_signed):d}\n")
+
             reset = field.get_property('reset')
             if isinstance(reset, int):
                 self.write(f"#define {field_prefix}_reset {reset:#x}\n")

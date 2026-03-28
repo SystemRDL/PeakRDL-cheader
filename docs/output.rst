@@ -44,11 +44,39 @@ other fields of the same name.
 
     Width of the field in bits.
 
+.. data:: FIELD_NAME_iw
+
+    Fixed-point integer bit width.
+
+    Only emitted if the |intwidth|_ or |fracwidth|_ SystemRDL properties
+    are defined for the field.
+
+.. data:: FIELD_NAME_fw
+
+    Fixed-point fractional bit width.
+
+    Only emitted if the |intwidth|_ or |fracwidth|_ SystemRDL properties
+    are defined for the field.
+
+.. data:: FIELD_NAME_signed
+
+    Field signedness.
+
+    Only emitted if the |is_signed|_, |intwidth|_, or |fracwidth|_ SystemRDL
+    properties are defined for the field.
+
 .. data:: FIELD_NAME_reset
 
     Field reset value.
 
     Only emitted if a field definition provides a constant reset value.
+
+.. |intwidth| replace:: ``intwidth``
+.. _intwidth: https://peakrdl-regblock.readthedocs.io/en/latest/udps/fixedpoint.html
+.. |fracwidth| replace:: ``fracwidth``
+.. _fracwidth: https://peakrdl-regblock.readthedocs.io/en/latest/udps/fixedpoint.html
+.. |is_signed| replace:: ``is_signed``
+.. _is_signed: https://peakrdl-regblock.readthedocs.io/en/latest/udps/signed.html
 
 
 Register bit-field structs

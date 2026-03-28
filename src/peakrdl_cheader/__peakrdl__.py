@@ -5,6 +5,7 @@ from peakrdl.config import schema
 
 from .exporter import CHeaderExporter
 from .c_standards import CStandard
+from .udps import ALL_UDPS
 
 if TYPE_CHECKING:
     import argparse
@@ -12,6 +13,8 @@ if TYPE_CHECKING:
 
 class Exporter(ExporterSubcommandPlugin):
     short_desc = "Generate a C header definition of an address space"
+
+    udp_definitions = ALL_UDPS
 
     cfg_schema = {
         "std": schema.Choice(list(CStandard.__members__.keys())),
