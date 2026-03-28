@@ -55,4 +55,41 @@ addrmap basic {
         field { fieldwidth=8; sw = r; } basicfield_r;
     } basicreg_g;
 
+    // enum encodings
+
+    // "global"
+    enum some_global_encoding {
+	ABC = 5;
+	DEF = 6;
+    };
+
+    reg {
+        field {
+	    // defined inside field
+	    enum basicfield_s_encoding {
+		FOO = 1;
+		BAR = 2;
+	    };
+	    encode = basicfield_s_encoding;
+	} basicfield_s[4];
+
+	// defined in reg
+	enum basicreg_h_encoding {
+	    FOO = 3;
+	    BAR = 4;
+	};
+        field {
+	    encode = basicreg_h_encoding;
+	} basicfield_t[4];
+
+	// use global enum
+        field {
+	    encode = some_global_encoding;
+	} basicfield_u[4];
+
+        field {
+	    // reuse previously defined one in reg scope
+	    encode = basicreg_h_encoding;
+	} basicfield_v[4];
+    } basicreg_h;
 };
