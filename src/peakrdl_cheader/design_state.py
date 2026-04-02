@@ -48,6 +48,9 @@ class DesignState:
         self.bitfield_order_ltoh: bool
         self.bitfield_order_ltoh = kwargs.pop("bitfield_order_ltoh", True)
 
+        self.generate_enums: bool
+        self.generate_enums = kwargs.pop("generate_enums", False)
+
         # If a register is wider than 64-bits, it cannot be represented by a stdint
         # type. Therefore it must be represented by an array of subwords
         self.wide_reg_subword_size: int
