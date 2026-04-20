@@ -40,6 +40,10 @@ class DesignState:
         self.reuse_typedefs: bool
         self.reuse_typedefs = kwargs.pop("reuse_typedefs", True)
 
+        # Enable genration of non zero reset value only
+        self.non_zero_reset_only: bool
+        self.non_zero_reset_only = kwargs.pop("non_zero_reset_only", False)   
+
         # Enable generation of bit-field structs for registers
         self.generate_bitfields: bool
         self.generate_bitfields = kwargs.pop("generate_bitfields", False)
