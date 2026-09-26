@@ -3,37 +3,37 @@ from typing import Union
 from systemrdl.node import AddressableNode, AddrmapNode, Node, MemNode, RegfileNode
 from .design_state import DesignState
 
-def get_node_prefix(ds: DesignState, root_node: Union[AddrmapNode, MemNode, RegfileNode], node: AddressableNode) -> str:
+def get_node_prefix(ds: DesignState, root_node: Union[AddrmapNode, MemNode, RegfileNode], node: AddressableNode, separator: str = "__") -> str:
     if ds.reuse_typedefs:
-        prefix = node.get_global_type_name("__")
+        prefix = node.get_global_type_name(separator)
         if prefix is None:
             # Unable to determine a reusable type name. Fall back to hierarchical path
             # Add prefix to prevent collision when mixing namespace methods
-            prefix = "xtern__" + node.get_rel_path(
+            prefix = "xtern" + separator + node.get_rel_path(
                 root_node.parent,
-                hier_separator="__",
+                hier_separator=separator,
                 array_suffix="x",
                 empty_array_suffix="x"
             )
     else:
         prefix = node.get_rel_path(
             root_node.parent,
-            hier_separator="__",
+            hier_separator=separator,
             array_suffix="x",
             empty_array_suffix="x"
         )
     return prefix
 
 
-def get_struct_name(ds: DesignState, root_node: Union[AddrmapNode, MemNode, RegfileNode], node: AddressableNode) -> str:
+def get_struct_name(ds: DesignState, root_node: Union[AddrmapNode, MemNode, RegfileNode], node: AddressableNode, separator: str = "__") -> str:
     if node.is_array and node.array_stride > node.size: # type: ignore # is_array implies array_stride is not none
         # Stride is larger than size of actual element.
         # Struct will be padded up, and therefore needs a unique name
-        pad_suffix = f"__stride{node.array_stride:x}"
+        pad_suffix = f"{separator}stride{node.array_stride:x}"
     else:
         pad_suffix = ""
 
-    return get_node_prefix(ds, root_node, node) + pad_suffix + "_t"
+    return get_node_prefix(ds, root_node, node, separator) + pad_suffix + "_t"
 
 
 def get_friendly_name(ds: DesignState, root_node: Union[AddrmapNode, MemNode, RegfileNode], node: Node) -> str:
