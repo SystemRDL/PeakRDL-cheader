@@ -1,9 +1,10 @@
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 from systemrdl.walker import RDLListener, RDLWalker, WalkerAction
-from systemrdl.node import AddrmapNode, RegNode, AddressableNode
+from systemrdl.node import AddrmapNode, MemNode, RegfileNode, RegNode, AddressableNode
 
 from .design_state import DesignState
+from . import utils
 
 class DesignScanner(RDLListener):
     def __init__(self, ds: DesignState) -> None:
@@ -12,6 +13,8 @@ class DesignScanner(RDLListener):
 
         self.prev_reg_stack: List[Optional[RegNode]]
         self.prev_reg_stack = []
+        self.reg_prefix_origins: Dict[str, str] = {}
+        self.struct_origins: Dict[str, str] = {}
 
     @property
     def top_node(self) -> AddrmapNode:
@@ -26,9 +29,46 @@ class DesignScanner(RDLListener):
 
 
     def enter_AddressableComponent(self, node: AddressableNode) -> Optional[WalkerAction]:
+        self.check_namespace(node)
         if not isinstance(node, RegNode):
             self.prev_reg_stack.append(None)
         return WalkerAction.Continue
+
+
+    def check_namespace(self, node: AddressableNode) -> None:
+        root_node: AddressableNode = self.top_node
+        if self.ds.explode_top:
+            if node == self.top_node:
+                return
+            root_node = node
+            while root_node.parent != self.top_node:
+                assert isinstance(root_node.parent, AddressableNode)
+                root_node = root_node.parent
+            if isinstance(root_node, RegNode):
+                return
+        assert isinstance(root_node, (AddrmapNode, MemNode, RegfileNode))
+
+        # Keep scope boundaries distinct from underscores in RDL identifiers.
+        # Repeated instances of the same type still have the same origin.
+        if isinstance(node, RegNode):
+            name = utils.get_node_prefix(self.ds, root_node, node).upper()
+            origin = utils.get_node_prefix(self.ds, root_node, node, "::")
+            self.check_name(name, origin, node, self.reg_prefix_origins)
+            if not self.ds.generate_bitfields:
+                return
+
+        name = utils.get_struct_name(self.ds, root_node, node)
+        origin = utils.get_struct_name(self.ds, root_node, node, "::")
+        self.check_name(name, origin, node, self.struct_origins)
+
+
+    def check_name(self, name: str, origin: str, node: AddressableNode, origins: Dict[str, str]) -> None:
+        previous = origins.setdefault(name, origin)
+        if previous != origin:
+            self.msg.error(
+                f"Generated name '{name}' collides between '{previous}' and '{origin}'.",
+                node.inst_src_ref
+            )
 
     def exit_AddressableComponent(self, node: AddressableNode) -> Optional[WalkerAction]:
         if not isinstance(node, RegNode):
