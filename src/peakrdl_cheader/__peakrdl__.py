@@ -34,7 +34,7 @@ class Exporter(ExporterSubcommandPlugin):
             "--linux-kernel",
             action="store_true",
             default=False,
-            help=""""
+            help="""
             If set, output uses Linux kernel-compatible header includes.
             """
         )
@@ -56,7 +56,7 @@ class Exporter(ExporterSubcommandPlugin):
             "-x", "--explode-top",
             action="store_true",
             default=False,
-            help=""""
+            help="""
             If set, the top-level hierarchy is skipped. Instead, definitions for
             all the direct children are generated.
 
@@ -69,7 +69,7 @@ class Exporter(ExporterSubcommandPlugin):
             "-i", "--instantiate",
             action="store_true",
             default=False,
-            help=""""
+            help="""
             If set, header will also include a macro that instantiates each top-level
             block at a defined hardware address, allowing for direct access.
             """
