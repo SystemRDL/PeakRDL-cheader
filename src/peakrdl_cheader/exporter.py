@@ -53,6 +53,10 @@ class CHeaderExporter:
             Apply an additional address offset to instance definitions.
         testcase: bool
             Generate a testcase C file
+        export_parameters: bool
+            If set, emit ``#define`` macros for each elaborated parameter of the
+            top-level addrmap. Macro names follow ``{INST}__{PARAM}`` (uppercased).
+            Struct array dimensions remain numeric literals.
         """
         # If it is the root node, skip to top addrmap
         if isinstance(node, RootNode):

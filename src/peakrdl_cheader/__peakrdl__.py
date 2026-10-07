@@ -122,6 +122,17 @@ class Exporter(ExporterSubcommandPlugin):
             """
         )
 
+        arg_group.add_argument(
+            "--export-parameters",
+            action="store_true",
+            default=False,
+            help="""
+            If set, emit #define macros for each elaborated parameter of the
+            top-level addrmap (e.g. FOO__BAR). Struct array dimensions remain
+            numeric literals.
+            """
+        )
+
     def do_export(self, top_node: 'AddrmapNode', options: 'argparse.Namespace') -> None:
         std_name = options.std or self.cfg['std'] or "latest"
         std = CStandard[std_name]
@@ -148,4 +159,5 @@ class Exporter(ExporterSubcommandPlugin):
             instantiate=options.instantiate,
             inst_offset=options.inst_offset,
             testcase=options.testcase,
+            export_parameters=options.export_parameters,
         )

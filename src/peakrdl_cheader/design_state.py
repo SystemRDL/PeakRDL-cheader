@@ -65,3 +65,6 @@ class DesignState:
 
         self.testcase: bool
         self.testcase = kwargs.pop("testcase", False)
+
+        self.export_parameters: bool
+        self.export_parameters = kwargs.pop("export_parameters", False)

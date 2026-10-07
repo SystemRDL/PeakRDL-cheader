@@ -1,4 +1,4 @@
-from typing import TextIO, Set, Optional, List, Union
+from typing import TextIO, Set, Optional, List, Union, Any
 import os
 import re
 
@@ -35,6 +35,9 @@ class HeaderGenerator(RDLListener):
             template = self.ds.jj_env.get_template("header.h")
             template.stream(context).dump(f) # type: ignore # jinja incorrectly typed
             f.write("\n")
+
+            # Optional top-level addrmap parameter defines
+            self.write_parameters()
 
             # Generate definitions
             for node in top_nodes:
@@ -74,6 +77,56 @@ class HeaderGenerator(RDLListener):
         if self.indent_level:
             self.f.write("    " * self.indent_level)
         self.f.write(s)
+
+    def format_parameter_value(self, value: Any) -> Optional[str]:
+        """
+        Format an elaborated SystemRDL parameter value as a C macro replacement.
+        Returns None for unsupported types.
+        """
+        # bool is a subclass of int — check it first
+        if isinstance(value, bool):
+            return "1" if value else "0"
+        if isinstance(value, int):
+            # systemrdl may elaborate signed longint negatives as unsigned 64-bit
+            if value > (2**63 - 1):
+                signed = value - (1 << 64)
+                return f"{signed}L"
+            return f"{value}UL"
+        if isinstance(value, str):
+            escaped = value.replace("\\", "\\\\").replace('"', '\\"')
+            return f'"{escaped}"'
+        return None
+
+    def write_parameters(self) -> None:
+        if not self.ds.export_parameters:
+            return
+
+        top = self.ds.top_node
+        parameters = top.parameters
+        if not parameters:
+            return
+
+        lines = []
+        seen: Set[str] = set()
+        for name, value in parameters.items():
+            c_value = self.format_parameter_value(value)
+            if c_value is None:
+                continue
+
+            macro = f"{top.inst_name}__{name}".upper()
+            if macro in seen:
+                top.env.msg.fatal(
+                    f"Duplicate parameter define name after uppercasing: {macro}",
+                    top.inst_src_ref
+                )
+            seen.add(macro)
+            self.defined_namespace.add(macro)
+            lines.append(f"#define {macro} {c_value}\n")
+
+        if lines:
+            self.f.write("\n// Parameters\n")
+            for line in lines:
+                self.f.write(line)
 
 
     def get_node_prefix(self, node: AddressableNode) -> str:

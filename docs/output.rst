@@ -15,6 +15,32 @@ If anonymous unions are not supported by the C-standard you have selected, the
 union will be named based on the two registers.
 
 
+Address map parameters
+----------------------
+If ``--export-parameters`` is enabled (or ``export_parameters=True`` via the
+Python API), each elaborated parameter of the top-level ``addrmap`` is emitted
+as a ``#define`` macro.
+
+Macro names use the form ``{INST}__{PARAM}`` (uppercased), where ``INST`` is the
+top-level instance name and ``PARAM`` is the SystemRDL parameter name. For
+example, ``addrmap foo #(longint unsigned bar = 3)`` yields::
+
+    #define FOO__BAR 3UL
+
+Supported elaborated value types are:
+
+* integers (including ``bit``), emitted with a ``UL`` or ``L`` suffix
+* booleans, emitted as ``1`` or ``0``
+* strings, emitted as C string literals
+
+Other parameter types are skipped. Nested component parameters are not exported.
+
+.. note::
+
+   Packed struct array dimensions continue to use numeric literals. Enabling
+   parameter export does not rewrite struct members to reference these macros.
+
+
 Bit-fiddling Field Macros
 -------------------------
 Each field is accompanied by several ``#define`` macros.
