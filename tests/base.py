@@ -25,6 +25,7 @@ class BaseHeaderTestcase(TestCase):
     wide_reg_subword_size = 32
     explode_top = False
     instantiate = False
+    export_parameters = False
 
     @classmethod
     def get_run_dir(cls) -> str:
@@ -72,6 +73,7 @@ class BaseHeaderTestcase(TestCase):
             instantiate=self.instantiate,
             inst_offset=0,
             testcase=True,
+            export_parameters=self.export_parameters,
         )
 
         self._write_params()

@@ -6,6 +6,7 @@ from parameterized import parameterized_class
 
 exceptions = [
     "testcases/wide_regs.rdl",
+    "testcases/params.rdl",
 ]
 files = glob.glob("testcases/*.rdl")
 files = [file for file in files if not file in exceptions]
