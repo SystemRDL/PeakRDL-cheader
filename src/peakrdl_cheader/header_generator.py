@@ -153,7 +153,10 @@ class HeaderGenerator(RDLListener):
 
 
     def exit_Reg(self, node: RegNode) -> None:
-        if not self.ds.generate_bitfields:
+        # Elements of a sparse register array are padded out to the array
+        # stride, so they always need their own type, even without bit-fields.
+        is_sparse = utils.is_sparse_array(node)
+        if not (self.ds.generate_bitfields or is_sparse):
             return
 
         union_name = self.get_struct_name(node)
@@ -179,15 +182,21 @@ class HeaderGenerator(RDLListener):
                 f_fields.append(field)
 
         # Generate a union+struct for the register
-        self.write("typedef union {\n")
+        if is_sparse:
+            assert node.array_stride is not None
+            self.write(f"\n// {self.get_friendly_name(node)} (array element, padded to a {node.array_stride:#x} byte stride)\n")
+            self.write("typedef union __attribute__ ((__packed__)) {\n")
+        else:
+            self.write("typedef union {\n")
         self.push_indent()
 
         regwidth = node.get_property('regwidth')
 
         # Write bitfield struct members
-        self.write_bitfields("f", regwidth, f_fields)
-        self.write_bitfields("fr", regwidth, fr_fields)
-        self.write_bitfields("fw", regwidth, fw_fields)
+        if self.ds.generate_bitfields:
+            self.write_bitfields("f", regwidth, f_fields)
+            self.write_bitfields("fr", regwidth, fr_fields)
+            self.write_bitfields("fw", regwidth, fw_fields)
 
         # Write word member
         if regwidth > 64:
@@ -197,6 +206,10 @@ class HeaderGenerator(RDLListener):
             self.write(f"uint{self.ds.wide_reg_subword_size}_t w[{n_subwords}];\n")
         else:
             self.write(f"uint{regwidth}_t w;\n")
+
+        if is_sparse:
+            # Pad the union out to the array stride
+            self.write(f"uint8_t RESERVED[{node.array_stride:#x}];\n")
 
         self.pop_indent()
         self.write(f"}} {union_name};\n")
@@ -322,7 +335,7 @@ class HeaderGenerator(RDLListener):
         else:
             array_suffix = ""
 
-        if self.ds.generate_bitfields:
+        if self.ds.generate_bitfields or utils.is_sparse_array(node):
             struct_name = self.get_struct_name(node)
             self.write(f"{struct_name} {kwf(node.inst_name)}{array_suffix};\n")
         else:

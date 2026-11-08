@@ -82,14 +82,6 @@ class DesignScanner(RDLListener):
             # Save information about register overlap pair
             self.ds.overlapping_reg_pairs[prev_reg.get_path()] = node.inst_name
 
-        # Check for sparse register arrays
-        if node.is_array and node.array_stride > node.size: # type: ignore # is_array implies array_stride is not none
-            self.msg.error(
-                "C header export does not support sparse arrays of registers. "
-                f"See register: '{node.inst_name}.'",
-                node.inst_src_ref
-            )
-
         return WalkerAction.SkipDescendants
 
     def exit_Reg(self, node: RegNode) -> None:

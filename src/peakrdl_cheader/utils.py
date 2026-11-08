@@ -25,8 +25,16 @@ def get_node_prefix(ds: DesignState, root_node: Union[AddrmapNode, MemNode, Regf
     return prefix
 
 
+def is_sparse_array(node: AddressableNode) -> bool:
+    """
+    Returns True if the node is an array whose stride is larger than the size
+    of each element, leaving a gap after every element.
+    """
+    return node.is_array and node.array_stride > node.size # type: ignore # is_array implies array_stride is not none
+
+
 def get_struct_name(ds: DesignState, root_node: Union[AddrmapNode, MemNode, RegfileNode], node: AddressableNode) -> str:
-    if node.is_array and node.array_stride > node.size: # type: ignore # is_array implies array_stride is not none
+    if is_sparse_array(node):
         # Stride is larger than size of actual element.
         # Struct will be padded up, and therefore needs a unique name
         pad_suffix = f"__stride{node.array_stride:x}"

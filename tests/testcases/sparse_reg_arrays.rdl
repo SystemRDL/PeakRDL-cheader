@@ -1,0 +1,52 @@
+// Register arrays where the stride is larger than the register itself
+addrmap sparse_reg_arrays {
+    default sw = rw;
+    default hw = r;
+
+    reg ctrl_reg {
+        field {} enable[0:0] = 0;
+        field {} mode[3:1] = 0;
+        field {} count[15:8] = 0;
+    };
+
+    reg data8_reg {
+        regwidth = 8;
+        field {} d[8] = 0;
+    };
+
+    reg data64_reg {
+        regwidth = 64;
+        field {} lo[32] = 0;
+        field {} hi[32] = 0;
+    };
+
+    reg r_ro {
+        field {sw=r; hw=w;} f[8];
+    };
+    reg r_wo {
+        field {sw=w; hw=r;} f[8];
+    };
+
+    // Same register type used both densely and sparsely
+    ctrl_reg dense[4];
+    ctrl_reg sparse[4] += 0x10;
+
+    // Narrow and wide registers
+    data8_reg bytes[3] @ 0x100 += 0x4;
+    data64_reg words[2] @ 0x120 += 0x20;
+
+    // Multi-dimensional: the stride applies to every element
+    ctrl_reg grid[2][3] @ 0x200 += 0x8;
+
+    // Read-only + write-only sparse arrays sharing the same addresses
+    r_ro status[4] @ 0x300 += 0x8;
+    r_wo command[4] @ 0x300 += 0x8;
+
+    // Sparse register arrays inside an array of regfiles
+    regfile {
+        ctrl_reg cfg;
+        ctrl_reg lanes[2] += 0xC;
+    } channel[2] @ 0x400 += 0x40;
+
+    ctrl_reg after_gap;
+};
