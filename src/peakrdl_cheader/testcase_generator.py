@@ -116,8 +116,9 @@ class OffsetTestsGenerator(RDLListener):
             return kwf(m.group(0))
         member = re.sub(r"\w+", kwrepl, member)
 
-        if self.ds.generate_bitfields:
-            # Reg is defined as a bitfield union. Access entire word member
+        if self.ds.generate_bitfields or utils.is_sparse_array(node):
+            # Reg is defined as a union (bit-fields and/or padding to the array
+            # stride). Access entire word member
             member += ".w"
 
         regwidth = node.get_property('regwidth')

@@ -15,6 +15,18 @@ If anonymous unions are not supported by the C-standard you have selected, the
 union will be named based on the two registers.
 
 
+Sparse register arrays
+^^^^^^^^^^^^^^^^^^^^^^
+If an array of registers has a stride that is larger than the register
+(for example ``my_reg regs[4] += 0x10;``), each element is represented by a
+packed union that is padded out to the array stride. The register itself is
+accessed through the union's ``.w`` member (and ``.f`` if bit-fields are
+enabled), for example ``regs[2].w``.
+
+The padded union is named after the register type with a ``__stride<N>``
+suffix, so it does not collide with dense instances of the same register.
+
+
 Bit-fiddling Field Macros
 -------------------------
 Each field is accompanied by several ``#define`` macros.

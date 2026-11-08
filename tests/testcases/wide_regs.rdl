@@ -18,6 +18,7 @@ addrmap top {
     wide_reg r1;
     wide_reg r2[4];
     wide_reg r3;
+    wide_reg r4[3] += 0x20; // sparse
 
     external mem_empty #(.WIDTH(128)) mem_empty_128;
 };
