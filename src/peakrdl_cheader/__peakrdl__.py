@@ -140,6 +140,7 @@ class Exporter(ExporterSubcommandPlugin):
             top_node,
             path=options.output,
             std=std,
+            linux_kernel=options.linux_kernel,
             generate_bitfields=generate_bitfields,
             bitfield_order_ltoh=bitfield_order_ltoh,
             reuse_typedefs=reuse_typedefs,
