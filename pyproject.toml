@@ -44,8 +44,14 @@ Tracker = "https://github.com/SystemRDL/PeakRDL-cheader/issues"
 Changelog = "https://github.com/SystemRDL/PeakRDL-cheader/releases"
 Documentation = "https://peakrdl-cheader.readthedocs.io/"
 
+[tool.setuptools]
+include-package-data = true
+
 [tool.setuptools.dynamic]
 version = {attr = "peakrdl_cheader.__about__.__version__"}
+
+[tool.setuptools.package-data]
+peakrdl_cheader = ["templates/**/*"]
 
 [project.entry-points."peakrdl.exporters"]
 c-header = "peakrdl_cheader.__peakrdl__:Exporter"
